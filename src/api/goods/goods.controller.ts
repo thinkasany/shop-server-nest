@@ -1,23 +1,18 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { GoodsService } from './goods.service';
-import { CreateGoodDto } from './dto/create-good.dto';
-import { UpdateGoodDto } from './dto/update-good.dto';
 
-@Controller('goods')
+@Controller('api/goods')
 export class GoodsController {
   constructor(private readonly goodsService: GoodsService) {}
 
   @Get()
   findAll() {
     return this.goodsService.indexAction();
+  }
+
+  @Get('test')
+  test() {
+    console.log('test');
   }
 
   // @Post()

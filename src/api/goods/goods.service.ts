@@ -1,8 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { CreateGoodDto } from './dto/create-good.dto';
-import { UpdateGoodDto } from './dto/update-good.dto';
-import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
-import { EntityManager, Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { GoodsEntity } from './entities/good.entity';
 @Injectable()
 export class GoodsService {
@@ -14,8 +12,6 @@ export class GoodsService {
   // private manager: EntityManager;
   async indexAction() {
     const data = await this.goodsRepository.find();
-    console.log(data);
     return data;
-    return 'hello world';
   }
 }

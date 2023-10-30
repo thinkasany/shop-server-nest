@@ -29,13 +29,13 @@ export class GoodsEntity {
   @Column({ type: 'varchar', length: 100 })
   retail_price: string;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0.00 })
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0.0 })
   min_retail_price: number;
 
   @Column({ type: 'varchar', length: 100 })
   cost_price: string;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0.00 })
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0.0 })
   min_cost_price: number;
 
   @Column({ type: 'varchar', length: 255 })
