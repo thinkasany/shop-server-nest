@@ -1,7 +1,7 @@
 // settings.entity.ts
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity('xzzshop_settings')
+@Entity('shop_settings')
 export class SettingsEntity {
   @PrimaryGeneratedColumn()
   id: number;

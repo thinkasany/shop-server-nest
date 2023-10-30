@@ -14,24 +14,4 @@ export class GoodsController {
   test() {
     console.log('test');
   }
-
-  // @Post()
-  // create(@Body() createGoodDto: CreateGoodDto) {
-  //   return this.goodsService.create(createGoodDto);
-  // }
-
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.goodsService.findOne(+id);
-  // }
-
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateGoodDto: UpdateGoodDto) {
-  //   return this.goodsService.update(+id, updateGoodDto);
-  // }
-
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.goodsService.remove(+id);
-  // }
 }

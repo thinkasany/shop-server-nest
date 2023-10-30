@@ -6,18 +6,20 @@ import { SettingsModule } from './api/settings/settings.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { GoodsEntity } from './api/goods/entities/good.entity';
 import { SettingsEntity } from './api/settings/entities/setting.entity';
+import { AuthModule } from './api/auth/auth.module';
 
 @Module({
   imports: [
     GoodsModule,
     SettingsModule,
+    AuthModule,
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: 'localhost',
       port: 3306,
       username: 'root',
       password: '123456',
-      database: 'xzzshop', //shop
+      database: 'shop', //shop
       synchronize: true,
       logging: true,
       entities: [GoodsEntity, SettingsEntity],
@@ -27,6 +29,7 @@ import { SettingsEntity } from './api/settings/entities/setting.entity';
         authPlugin: 'sha256_password',
       },
     }),
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, Index } from 'typeorm';
 
-@Entity('xzzshop_goods')
+@Entity('shop_goods')
 @Index('cat_id', ['category_id'])
 @Index('goods_number', ['goods_number'])
 @Index('sort_order', ['sort_order'])
