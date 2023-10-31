@@ -8,12 +8,16 @@ import { GoodsEntity } from './api/goods/entities/good.entity';
 import { SettingsEntity } from './api/settings/entities/setting.entity';
 import { AuthModule } from './api/auth/auth.module';
 import { UserEntity } from './api/auth/entities/auth.entity';
+import { AddressModule } from './api/address/address.module';
+import { AddressEntity } from './api/address/entities/address.entity';
+import { RegionEntity } from './api/address/entities/region.entity';
 
 @Module({
   imports: [
     GoodsModule,
     SettingsModule,
     AuthModule,
+    AddressModule,
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: 'localhost',
@@ -23,7 +27,13 @@ import { UserEntity } from './api/auth/entities/auth.entity';
       database: 'shop', //shop
       synchronize: true,
       logging: true,
-      entities: [GoodsEntity, SettingsEntity, UserEntity],
+      entities: [
+        GoodsEntity,
+        SettingsEntity,
+        UserEntity,
+        AddressEntity,
+        RegionEntity,
+      ],
       poolSize: 10,
       connectorPackage: 'mysql2',
       extra: {
@@ -31,6 +41,7 @@ import { UserEntity } from './api/auth/entities/auth.entity';
       },
     }),
     AuthModule,
+    AddressModule,
   ],
   controllers: [AppController],
   providers: [AppService],

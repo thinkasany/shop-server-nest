@@ -107,7 +107,7 @@ export class AuthService {
       return {
         token: sessionData.session_key,
         userInfo: newUserInfo,
-        is_new: is_new,
+        is_new,
       };
     } catch (error) {
       console.log(error);
