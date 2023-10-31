@@ -7,6 +7,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { GoodsEntity } from './api/goods/entities/good.entity';
 import { SettingsEntity } from './api/settings/entities/setting.entity';
 import { AuthModule } from './api/auth/auth.module';
+import { UserEntity } from './api/auth/entities/auth.entity';
 
 @Module({
   imports: [
@@ -22,7 +23,7 @@ import { AuthModule } from './api/auth/auth.module';
       database: 'shop', //shop
       synchronize: true,
       logging: true,
-      entities: [GoodsEntity, SettingsEntity],
+      entities: [GoodsEntity, SettingsEntity, UserEntity],
       poolSize: 10,
       connectorPackage: 'mysql2',
       extra: {
