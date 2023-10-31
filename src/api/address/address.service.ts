@@ -12,8 +12,7 @@ export class AddressService {
     @InjectRepository(RegionEntity)
     private readonly regionRepository: Repository<RegionEntity>,
   ) {}
-  async getAddressesAction() {
-    const userId = 1104; // fixme，暂时先写死，后面完善这里
+  async getAddressesAction(userId: number) {
     const addressList = await this.addressRepository.find({
       where: { user_id: userId, is_delete: 0 },
       order: { id: 'DESC' },
@@ -40,6 +39,11 @@ export class AddressService {
       where: { id: regionId },
     });
     return region ? region.name : '';
+  }
+
+  async addressDetailAction(id: number, userId: number) {
+    // const userId = await this.idParserService.parseId();
+    console.log(id, userId);
   }
 
   async deleteAddressAction(payload: { id: number }) {

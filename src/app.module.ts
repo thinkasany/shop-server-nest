@@ -12,9 +12,17 @@ import { AddressModule } from './api/address/address.module';
 import { AddressEntity } from './api/address/entities/address.entity';
 import { RegionEntity } from './api/region/entities/region.entity';
 import { RegionModule } from './api/region/region.module';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
+    JwtModule.register({
+      global: true,
+      secret: 'sdfsdfsdf123123!ASDasdasdasdasda',
+      signOptions: {
+        expiresIn: '7d',
+      },
+    }),
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: 'localhost',
