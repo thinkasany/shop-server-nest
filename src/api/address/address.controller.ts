@@ -9,10 +9,11 @@ import {
 } from '@nestjs/common';
 import { LoginGuard } from 'src/login.guard';
 import { AddressService } from './address.service';
+import { UpdateAddressDto } from './dto/update-address.dto';
 
 @Controller('/api/address')
 export class AddressController {
-  constructor(private readonly addressService: AddressService) { }
+  constructor(private readonly addressService: AddressService) {}
 
   @Get('getAddresses')
   @UseGuards(LoginGuard)
@@ -23,23 +24,19 @@ export class AddressController {
 
   @Get('addressDetail')
   @UseGuards(LoginGuard)
-  async listAction(@Query('id') id: number, @Req() request) {
-    const { user_id: userId } = request.user;
-    return await this.addressService.addressDetailAction(id, userId);
+  async listAction(@Query('id') id: number) {
+    return await this.addressService.addressDetailAction(id);
   }
 
   @Post('deleteAddress')
-  create(@Body() payload: { id: number }) {
+  deleteAddressAction(@Body() payload: { id: number }) {
     return this.addressService.deleteAddressAction(payload);
   }
 
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.addressService.findOne(+id);
-  // }
-
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateAddressDto: UpdateAddressDto) {
-  //   return this.addressService.update(+id, updateAddressDto);
-  // }
+  @Post('saveAddress')
+  @UseGuards(LoginGuard)
+  saveAddressAction(@Body() payload: UpdateAddressDto, @Req() request) {
+    const { user_id: userId } = request.user;
+    return this.addressService.saveAddressAction(payload, userId);
+  }
 }
