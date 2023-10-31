@@ -10,14 +10,11 @@ import { AuthModule } from './api/auth/auth.module';
 import { UserEntity } from './api/auth/entities/auth.entity';
 import { AddressModule } from './api/address/address.module';
 import { AddressEntity } from './api/address/entities/address.entity';
-import { RegionEntity } from './api/address/entities/region.entity';
+import { RegionEntity } from './api/region/entities/region.entity';
+import { RegionModule } from './api/region/region.module';
 
 @Module({
   imports: [
-    GoodsModule,
-    SettingsModule,
-    AuthModule,
-    AddressModule,
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: 'localhost',
@@ -40,8 +37,11 @@ import { RegionEntity } from './api/address/entities/region.entity';
         authPlugin: 'sha256_password',
       },
     }),
+    GoodsModule,
+    SettingsModule,
     AuthModule,
     AddressModule,
+    RegionModule,
   ],
   controllers: [AppController],
   providers: [AppService],

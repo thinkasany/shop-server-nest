@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AddressEntity } from './entities/address.entity';
-import { RegionEntity } from './entities/region.entity';
+import { RegionEntity } from '../region/entities/region.entity';
 
 @Injectable()
 export class AddressService {
