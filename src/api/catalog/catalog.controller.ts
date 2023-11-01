@@ -3,7 +3,7 @@ import { CatalogService } from './catalog.service';
 
 @Controller('api/catalog')
 export class CatelogController {
-  constructor(private readonly catelogService: CatalogService) { }
+  constructor(private readonly catelogService: CatalogService) {}
   // 获取分类栏目数据
   @Get('index')
   indexAction() {
