@@ -6,6 +6,8 @@ import { AdEntity } from './entities/ad.entity';
 import { NoticeEntity } from './entities/notice.entity';
 import { CategoryEntity } from '../catalog/entities/catalog.entity';
 import { GoodsEntity } from '../goods/entities/good.entity';
+import { GetLoginUserIdInterceptor } from 'src/getLoginUserId.interceptor';
+import { CartEntity } from '../cart/entities/cart.entity';
 
 @Module({
   imports: [
@@ -14,9 +16,10 @@ import { GoodsEntity } from '../goods/entities/good.entity';
       NoticeEntity,
       CategoryEntity,
       GoodsEntity,
+      CartEntity,
     ]),
   ],
   controllers: [IndexController],
-  providers: [IndexService],
+  providers: [IndexService, GetLoginUserIdInterceptor],
 })
 export class IndexModule {}

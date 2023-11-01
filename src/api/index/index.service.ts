@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, MoreThanOrEqual } from 'typeorm';
+import { CartEntity } from '../cart/entities/cart.entity';
 import { CategoryEntity } from '../catalog/entities/catalog.entity';
 import { GoodsEntity } from '../goods/entities/good.entity';
 import { AdEntity } from './entities/ad.entity';
@@ -15,8 +16,10 @@ export class IndexService {
   @InjectRepository(CategoryEntity)
   private readonly categoryRepository: Repository<CategoryEntity>;
   @InjectRepository(GoodsEntity)
-  private goodsRepository: Repository<GoodsEntity>;
-  async appInfoAction() {
+  private readonly goodsRepository: Repository<GoodsEntity>;
+  @InjectRepository(CartEntity)
+  private readonly cartRepository: Repository<CartEntity>;
+  async appInfoAction(userId) {
     const banner = await this.adRepository
       .createQueryBuilder('ad')
       .select(['ad.link_type', 'ad.goods_id', 'ad.image_url', 'ad.link'])
@@ -77,7 +80,19 @@ export class IndexService {
       });
       categoryItem.goodsList = categoryGoods;
     }
+    let cartCount = 0;
+    if (userId) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      cartCount = await this.cartRepository.count({
+        where: {
+          userId,
+          isDelete: 0,
+        },
+      });
+    }
+    console.log('userId', userId);
     return {
+      cartCount,
       notice,
       banner,
       channel,

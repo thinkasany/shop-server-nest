@@ -22,6 +22,8 @@ import { CategoryEntity } from './api/catalog/entities/catalog.entity';
 import { IndexModule } from './api/index/index.module';
 import { AdEntity } from './api/index/entities/ad.entity';
 import { NoticeEntity } from './api/index/entities/notice.entity';
+import { CartModule } from './api/cart/cart.module';
+import { CartEntity } from './api/cart/entities/cart.entity';
 
 @Module({
   imports: [
@@ -52,6 +54,7 @@ import { NoticeEntity } from './api/index/entities/notice.entity';
         CategoryEntity,
         AdEntity,
         NoticeEntity,
+        CartEntity,
       ],
       poolSize: 10,
       connectorPackage: 'mysql2',
@@ -68,6 +71,7 @@ import { NoticeEntity } from './api/index/entities/notice.entity';
     OrderModule,
     CatalogModule,
     IndexModule,
+    CartModule,
   ],
   controllers: [AppController],
   providers: [AppService],
