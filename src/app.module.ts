@@ -15,6 +15,8 @@ import { RegionModule } from './api/region/region.module';
 import { JwtModule } from '@nestjs/jwt';
 import { FootprintModule } from './api/footprint/footprint.module';
 import { FootprintEntity } from './api/footprint/entities/footprint.entity';
+import { OrderModule } from './api/order/order.module';
+import { OrderEntity } from './api/order/entities/order.entity';
 
 @Module({
   imports: [
@@ -41,6 +43,7 @@ import { FootprintEntity } from './api/footprint/entities/footprint.entity';
         AddressEntity,
         RegionEntity,
         FootprintEntity,
+        OrderEntity,
       ],
       poolSize: 10,
       connectorPackage: 'mysql2',
@@ -54,6 +57,7 @@ import { FootprintEntity } from './api/footprint/entities/footprint.entity';
     AddressModule,
     RegionModule,
     FootprintModule,
+    OrderModule,
   ],
   controllers: [AppController],
   providers: [AppService],
