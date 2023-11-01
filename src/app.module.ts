@@ -17,6 +17,8 @@ import { FootprintModule } from './api/footprint/footprint.module';
 import { FootprintEntity } from './api/footprint/entities/footprint.entity';
 import { OrderModule } from './api/order/order.module';
 import { OrderEntity } from './api/order/entities/order.entity';
+import { CatalogModule } from './api/catalog/catalog.module';
+import { CategoryEntity } from './api/catalog/entities/catalog.entity';
 
 @Module({
   imports: [
@@ -44,6 +46,7 @@ import { OrderEntity } from './api/order/entities/order.entity';
         RegionEntity,
         FootprintEntity,
         OrderEntity,
+        CategoryEntity,
       ],
       poolSize: 10,
       connectorPackage: 'mysql2',
@@ -58,6 +61,7 @@ import { OrderEntity } from './api/order/entities/order.entity';
     RegionModule,
     FootprintModule,
     OrderModule,
+    CatalogModule,
   ],
   controllers: [AppController],
   providers: [AppService],
