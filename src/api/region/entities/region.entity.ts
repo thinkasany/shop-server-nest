@@ -13,7 +13,7 @@ export class RegionEntity {
   id: number;
 
   @Column({ type: 'smallint', default: 0, name: 'parent_id' })
-  parentId: number;
+  parent_id: number;
 
   @Column({ type: 'varchar', length: 120, default: '' })
   name: string;
@@ -22,13 +22,13 @@ export class RegionEntity {
   type: number;
 
   @Column({ type: 'smallint', default: 0, name: 'agency_id' })
-  agencyId: number;
+  agency_id: number;
 
   @Column({ type: 'smallint', default: 0, name: 'area' })
   area: number;
 
   @Column({ type: 'varchar', length: 10, name: 'area_code', default: '0' })
-  areaCode: string;
+  area_code: string;
 
   @Column({ type: 'int', name: 'far_area', default: 0 })
   farArea: number;

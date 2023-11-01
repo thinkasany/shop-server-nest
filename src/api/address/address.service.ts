@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Not, Equal } from 'typeorm';
 import { AddressEntity } from './entities/address.entity';
 import { RegionEntity } from '../region/entities/region.entity';
 import { UpdateAddressDto } from './dto/update-address.dto';
@@ -43,9 +43,9 @@ export class AddressService {
     return region ? region.name : '';
   }
 
-  async addressDetailAction(id: number) {
+  async addressDetailAction(id: number, user_id: number) {
     const addressInfo: any = await this.addressRepository.findOne({
-      where: { id },
+      where: { id, user_id },
     });
     if (addressInfo) {
       addressInfo.province_name = await this.getRegionName(
@@ -60,7 +60,7 @@ export class AddressService {
         addressInfo.city_name +
         addressInfo.district_name;
     }
-    return addressInfo;
+    return addressInfo || {};
   }
 
   async deleteAddressAction(payload: { id: number }) {
@@ -91,7 +91,7 @@ export class AddressService {
     // 如果设置为默认，则取消其它的默认
     if (is_default === 1) {
       await this.addressRepository.update(
-        { id, user_id: userId },
+        { id: Not(Equal(id)), user_id: userId },
         { is_default: 0 },
       );
     }

@@ -18,14 +18,15 @@ export class AddressController {
   @Get('getAddresses')
   @UseGuards(LoginGuard)
   getAddressesAction(@Req() request) {
-    const { user_id: userId } = request.user;
+    const { id: userId } = request.user;
     return this.addressService.getAddressesAction(userId);
   }
 
   @Get('addressDetail')
   @UseGuards(LoginGuard)
-  async listAction(@Query('id') id: number) {
-    return await this.addressService.addressDetailAction(id);
+  async listAction(@Query('id') id: number, @Req() request) {
+    const { id: user_id } = request.user;
+    return await this.addressService.addressDetailAction(id, user_id);
   }
 
   @Post('deleteAddress')
@@ -36,7 +37,7 @@ export class AddressController {
   @Post('saveAddress')
   @UseGuards(LoginGuard)
   saveAddressAction(@Body() payload: UpdateAddressDto, @Req() request) {
-    const { user_id: userId } = request.user;
+    const { id: userId } = request.user;
     return this.addressService.saveAddressAction(payload, userId);
   }
 }

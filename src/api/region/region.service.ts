@@ -11,6 +11,6 @@ export class RegionService {
   ) {}
   async listAction(parentId: number): Promise<RegionEntity[]> {
     console.log(parentId);
-    return await this.regionRepository.find({ where: { parentId } });
+    return await this.regionRepository.find({ where: { parent_id: parentId } });
   }
 }
