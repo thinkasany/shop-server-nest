@@ -21,8 +21,8 @@ export class GetLoginUserIdInterceptor implements NestInterceptor {
     const request = context.switchToHttp().getRequest();
     const token = request.headers['x-xzzshop-token'] || '';
     try {
-      const data = await this.jwtService.verify(token);
-      request.user = data;
+      const { user } = await this.jwtService.verify(token);
+      request.user = user;
     } catch (e) {
       console.log(e);
     }

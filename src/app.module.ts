@@ -25,6 +25,12 @@ import { NoticeEntity } from './api/index/entities/notice.entity';
 import { CartModule } from './api/cart/cart.module';
 import { CartEntity } from './api/cart/entities/cart.entity';
 import { ShowSettingsEntity } from './api/settings/entities/showSettings.entity';
+import { SearchModule } from './api/search/search.module';
+import { KeywordsEntity } from './api/search/entities/keywords.entity';
+import { GoodsGalleryEntity } from './api/goods/entities/goodsGallery.entity';
+import { ProductEntity } from './api/goods/entities/product.entity';
+import { GoodsSpecificationEntity } from './api/goods/entities/goodsSpecification.entity';
+import { SpecificationEntity } from './api/goods/entities/specification.entity';
 
 @Module({
   imports: [
@@ -57,6 +63,11 @@ import { ShowSettingsEntity } from './api/settings/entities/showSettings.entity'
         NoticeEntity,
         CartEntity,
         ShowSettingsEntity,
+        KeywordsEntity,
+        GoodsGalleryEntity,
+        ProductEntity,
+        GoodsSpecificationEntity,
+        SpecificationEntity,
       ],
       poolSize: 10,
       connectorPackage: 'mysql2',
@@ -74,6 +85,7 @@ import { ShowSettingsEntity } from './api/settings/entities/showSettings.entity'
     CatalogModule,
     IndexModule,
     CartModule,
+    SearchModule,
   ],
   controllers: [AppController],
   providers: [AppService],
