@@ -1,5 +1,6 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import axios from 'axios';
 import * as crypto from 'crypto';
@@ -8,6 +9,8 @@ import { UserEntity } from './entities/auth.entity';
 @Injectable()
 export class AuthService {
   constructor(
+    @Inject(JwtService)
+    private jwtService: JwtService,
     @InjectRepository(UserEntity)
     private UserRepository: Repository<UserEntity>,
     private configService: ConfigService,
@@ -105,7 +108,7 @@ export class AuthService {
 
       console.log('newUserInfo', newUserInfo);
       return {
-        token: sessionData.session_key,
+        token: await this.jwtService.signAsync({ user: newUserInfo }),
         userInfo: newUserInfo,
         is_new,
       };

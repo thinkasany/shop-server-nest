@@ -14,4 +14,18 @@ export class GoodsService {
     const data = await this.goodsRepository.find();
     return data;
   }
+
+  async countAction() {
+    const data = await this.goodsRepository.count({
+      where: {
+        is_delete: 0,
+        is_on_sale: 1,
+      },
+    });
+    return {
+      data: {
+        goodsCount: data,
+      },
+    };
+  }
 }

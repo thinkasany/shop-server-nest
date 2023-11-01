@@ -24,6 +24,7 @@ import { AdEntity } from './api/index/entities/ad.entity';
 import { NoticeEntity } from './api/index/entities/notice.entity';
 import { CartModule } from './api/cart/cart.module';
 import { CartEntity } from './api/cart/entities/cart.entity';
+import { ShowSettingsEntity } from './api/settings/entities/showSettings.entity';
 
 @Module({
   imports: [
@@ -55,6 +56,7 @@ import { CartEntity } from './api/cart/entities/cart.entity';
         AdEntity,
         NoticeEntity,
         CartEntity,
+        ShowSettingsEntity,
       ],
       poolSize: 10,
       connectorPackage: 'mysql2',

@@ -6,19 +6,19 @@ export class CatelogController {
   constructor(private readonly catelogService: CatalogService) {}
   // 获取分类栏目数据
   @Get('index')
-  indexAction() {
-    return this.catelogService.indexAction();
+  async indexAction() {
+    return await this.catelogService.indexAction();
   }
 
   @Get('current')
-  currentAction(@Query('id') id: number) {
-    return this.catelogService.currentAction(id);
+  async currentAction(@Query('id') id: number) {
+    return await this.catelogService.currentAction(id);
   }
 
   @Post('currentlist')
-  currentlistAction(
+  async currentlistAction(
     @Body() payload: { id: number; size: number; page: number },
   ) {
-    return this.catelogService.currentlistAction(payload);
+    return await this.catelogService.currentlistAction(payload);
   }
 }

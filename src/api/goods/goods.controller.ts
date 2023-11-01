@@ -10,8 +10,8 @@ export class GoodsController {
     return this.goodsService.indexAction();
   }
 
-  @Get('test')
-  test() {
-    console.log('test');
+  @Get('count')
+  countAction() {
+    return this.goodsService.countAction();
   }
 }

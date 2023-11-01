@@ -1,15 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { SettingsEntity } from './entities/setting.entity';
+import { ShowSettingsEntity } from './entities/showSettings.entity';
 
 @Injectable()
 export class SettingsService {
   constructor(
-    @InjectRepository(SettingsEntity)
-    private settingsRepository: Repository<SettingsEntity>,
+    @InjectRepository(ShowSettingsEntity)
+    private showSettingsRepository: Repository<ShowSettingsEntity>,
   ) {}
-  async showSettingsAction(): Promise<SettingsEntity> {
-    return await this.settingsRepository.findOne({ where: { id: 1 } });
+  async showSettingsAction() {
+    const data = await this.showSettingsRepository.findOne({
+      where: { id: 1 },
+    });
+    return data;
   }
 }

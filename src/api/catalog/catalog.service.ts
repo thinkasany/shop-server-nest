@@ -59,9 +59,10 @@ export class CatalogService {
       .getManyAndCount();
     return {
       count: total,
-      data: list,
+      totalPages: 1,
       pageSize: size,
       currentPage: page,
+      data: list,
     };
   }
 }
