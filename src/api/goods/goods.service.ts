@@ -1,6 +1,7 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { ShopCommentEntity } from './entities/comment.entity';
 import { GoodsEntity } from './entities/good.entity';
 import { GoodsGalleryEntity } from './entities/goodsGallery.entity';
 import { GoodsSpecificationEntity } from './entities/goodsSpecification.entity';
@@ -19,9 +20,10 @@ export class GoodsService {
     private readonly goodsSpecificationRepository: Repository<GoodsSpecificationEntity>,
     @InjectRepository(SpecificationEntity)
     private readonly specificationRepository: Repository<SpecificationEntity>,
+    @InjectRepository(ShopCommentEntity)
+    private readonly commentRepository: Repository<ShopCommentEntity>,
   ) {}
 
-  // private manager: EntityManager;
   async indexAction() {
     const data = await this.goodsRepository.find();
     return data;
@@ -56,6 +58,7 @@ export class GoodsService {
     });
 
     // fixme: 增加足迹
+    console.log(userId);
     // await this.model("footprint").addFootprint(userId, goodsId);
     // console.log(id, userId, info);
     // console.log(id, userId, gallery);
@@ -112,5 +115,16 @@ export class GoodsService {
       valueList: info,
     };
     return data;
+  }
+
+  async commentAction(id) {
+    const info = await this.commentRepository.find({
+      where: {
+        goods_id: id,
+        is_delete: 0,
+        enabled: 1,
+      },
+    });
+    return info;
   }
 }

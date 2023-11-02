@@ -2,8 +2,10 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
+import { AddressEntity } from '../address/entities/address.entity';
 import { GoodsEntity } from '../goods/entities/good.entity';
 import { GoodsSpecificationEntity } from '../goods/entities/goodsSpecification.entity';
+import { OrderGoodsEntity } from '../goods/entities/orderGoods.entity';
 import { ProductEntity } from '../goods/entities/product.entity';
 import { CartEntity } from './entities/cart.entity';
 
@@ -18,6 +20,10 @@ export class CartService {
     private readonly productRepository: Repository<ProductEntity>,
     @InjectRepository(GoodsSpecificationEntity)
     private readonly goodsSpecificationRepository: Repository<GoodsSpecificationEntity>,
+    @InjectRepository(OrderGoodsEntity)
+    private readonly orderGoodsRepository: Repository<OrderGoodsEntity>,
+    @InjectRepository(AddressEntity)
+    private readonly addressRepository: Repository<AddressEntity>,
   ) {}
   /** 获取购物车信息，所有对购物车的增删改操作，都要重新返回购物车的信息 */
   async indexAction(userId) {
@@ -176,6 +182,87 @@ export class CartService {
       { is_delete: 1 },
     );
     return await this.getCart(0, userId);
+  }
+
+  async checkoutAction(payload, userId) {
+    const { addressId, addType, orderFrom, type } = payload;
+    let goodsCount = 0; // 购物车的数量
+    let goodsMoney = 0; // 购物车的总价
+    const freightPrice = 0;
+    let outStock = 0;
+    let cartData;
+    // 获取要购买的商品
+    if (type == 0) {
+      if (addType == 0) {
+        cartData = await this.getCart(0, userId);
+      } else if (addType == 1) {
+        cartData = await this.getCart(1, userId);
+      } else if (addType == 2) {
+        // cartData = await this.getAgainCart(orderFrom);
+      }
+    }
+    const checkedGoodsList = cartData.cartList.filter((v) => v.checked === 1);
+    for (const item of checkedGoodsList) {
+      goodsCount = goodsCount + item.number;
+      goodsMoney = goodsMoney + item.number * item.retail_price;
+      if (item.goods_number <= 0 || item.is_on_sale == 0) {
+        outStock = Number(outStock) + 1;
+      }
+    }
+    if (addType == 2) {
+      const againGoods = await this.orderGoodsRepository.find({
+        where: {
+          order_id: orderFrom,
+        },
+      });
+      let againGoodsCount = 0;
+      for (const item of againGoods) {
+        againGoodsCount = againGoodsCount + item.number;
+      }
+      if (goodsCount != againGoodsCount) {
+        outStock = 1;
+      }
+    }
+    // 选择的收货地址
+    let checkedAddress = null;
+    if (addressId == '' || addressId == 0) {
+      checkedAddress = await this.addressRepository.find({
+        where: {
+          is_default: 1,
+          user_id: userId,
+          is_delete: 0,
+        },
+      });
+    } else {
+      checkedAddress = await this.addressRepository.find({
+        where: {
+          id: addressId,
+          user_id: userId,
+          is_delete: 0,
+        },
+      });
+    }
+
+    // fixme: 运费模块
+    // 计算订单的费用
+    const goodsTotalPrice = cartData.cartTotal.checkedGoodsAmount; // 商品总价
+    // 获取是否有可用红包
+    const money = cartData.cartTotal.checkedGoodsAmount;
+    let orderTotalPrice = 0;
+    orderTotalPrice = Number(money) + Number(freightPrice); // 订单的总价
+    const actualPrice = orderTotalPrice; // 减去其它支付的金额后，要实际支付的金额
+    const numberChange = cartData.cartTotal.numberChange;
+    return {
+      checkedAddress,
+      freightPrice,
+      checkedGoodsList,
+      goodsTotalPrice,
+      orderTotalPrice: orderTotalPrice.toFixed(2),
+      actualPrice: actualPrice.toFixed(2),
+      goodsCount,
+      outStock,
+      numberChange,
+    };
   }
 
   async getCart(type, userId) {

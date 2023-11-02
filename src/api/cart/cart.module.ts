@@ -6,6 +6,8 @@ import { CartEntity } from './entities/cart.entity';
 import { GoodsEntity } from '../goods/entities/good.entity';
 import { ProductEntity } from '../goods/entities/product.entity';
 import { GoodsSpecificationEntity } from '../goods/entities/goodsSpecification.entity';
+import { AddressEntity } from '../address/entities/address.entity';
+import { OrderGoodsEntity } from '../goods/entities/orderGoods.entity';
 
 @Module({
   imports: [
@@ -14,6 +16,8 @@ import { GoodsSpecificationEntity } from '../goods/entities/goodsSpecification.e
       GoodsEntity,
       ProductEntity,
       GoodsSpecificationEntity,
+      OrderGoodsEntity,
+      AddressEntity,
     ]),
   ],
   controllers: [CartController],

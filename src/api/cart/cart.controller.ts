@@ -5,6 +5,7 @@ import {
   Body,
   Req,
   UseInterceptors,
+  Query,
 } from '@nestjs/common';
 import { GetLoginUserIdInterceptor } from 'src/getLoginUserId.interceptor';
 import { CartService } from './cart.service';
@@ -46,5 +47,20 @@ export class CartController {
   deleteAction(@Body() payload, @Req() request) {
     const { id: userId } = request.user || {};
     return this.cartService.deleteAction(payload, userId);
+  }
+
+  // 订单提交前的检验和填写相关订单信息
+  @Get('checkout')
+  @UseInterceptors(GetLoginUserIdInterceptor)
+  checkoutAction(
+    @Req() request,
+    @Query('addressId') addressId: number,
+    @Query('addType') addType: number,
+    @Query('type') type: number,
+    @Query('orderFrom') orderFrom?: any,
+  ) {
+    const { id: userId } = request.user || {};
+    const payload = { addressId, addType, orderFrom, type };
+    return this.cartService.checkoutAction(payload, userId);
   }
 }

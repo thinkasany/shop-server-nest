@@ -7,13 +7,18 @@ export class GoodsController {
   constructor(private readonly goodsService: GoodsService) {}
 
   @Get()
-  findAll() {
+  indexAction() {
     return this.goodsService.indexAction();
   }
 
   @Get('count')
   countAction() {
     return this.goodsService.countAction();
+  }
+
+  @Get('comment')
+  commentAction(@Query('id') id: number) {
+    return this.goodsService.commentAction(id);
   }
 
   @Get('detail')

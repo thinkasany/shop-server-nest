@@ -44,4 +44,5 @@ export class OrderEntity {
     comment: '订单删除标志',
   })
   is_delete: number;
+    goods: any;
 }

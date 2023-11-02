@@ -20,3 +20,9 @@ fixme
 2. /* eslint-disable @typescript-eslint/no-unused-vars */ 这个看着就有问题 let 的怎么就没调用了
 3. entity的对照着修改一下 下划线还是驼峰要注意检查
 4. ts any 可能是entity的错误 没时间搞
+
+todo
+先完成普通的初级接口，然后先用假的支付走通流程完成第一个pr
+支付和下单比较重要 单独再走一个接口
+现在需要做的是comment等
+fixme: 运费模块
