@@ -85,8 +85,8 @@ export class IndexService {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       cartCount = await this.cartRepository.count({
         where: {
-          userId,
-          isDelete: 0,
+          user_id: userId,
+          is_delete: 0,
         },
       });
     }

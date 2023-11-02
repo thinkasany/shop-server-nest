@@ -6,59 +6,59 @@ export class CartEntity {
   id: number;
 
   @Column({ name: 'user_id' })
-  userId: number;
+  user_id: number;
 
   @Column({ name: 'goods_id' })
-  goodsId: number;
+  goods_id: number;
 
   @Column({ name: 'goods_sn' })
-  goodsSn: string;
+  goods_sn: string;
 
   @Column({ name: 'product_id' })
-  productId: number;
+  product_id: number;
 
   @Column({ name: 'goods_name' })
-  goodsName: string;
+  goods_name: string;
 
   @Column({ name: 'goods_aka' })
-  goodsAka: string;
+  goods_aka: string;
 
   @Column({ name: 'goods_weight', type: 'double', precision: 4, scale: 2 })
-  goodsWeight: number;
+  goods_weight: number;
 
   @Column({ name: 'add_price', type: 'decimal', precision: 10, scale: 2 })
-  addPrice: number;
+  add_price: number;
 
   @Column({ name: 'retail_price', type: 'decimal', precision: 10, scale: 2 })
-  retailPrice: number;
+  retail_price: number;
 
   @Column()
   number: number;
 
   @Column({ name: 'goods_specifition_name_value', type: 'text' })
-  goodsSpecifitionNameValue: string;
+  goods_specifition_name_value: string;
 
   @Column({ name: 'goods_specifition_ids' })
-  goodsSpecifitionIds: string;
+  goods_specifition_ids: string;
 
   @Column()
   checked: number;
 
   @Column({ name: 'list_pic_url' })
-  listPicUrl: string;
+  list_pic_url: string;
 
   @Column({ name: 'freight_template_id' })
-  freightTemplateId: number;
+  freight_template_id: number;
 
-  @Column({ name: 'is_on_sale' })
-  isOnSale: number;
+  @Column({ name: 'is_on_sale', default: 1 })
+  is_on_sale: number;
 
   @Column({ name: 'add_time' })
-  addTime: number;
+  add_time: number;
 
-  @Column({ name: 'is_fast' })
-  isFast: number;
+  @Column({ name: 'is_fast', default: 0 })
+  is_fast: number;
 
-  @Column({ name: 'is_delete' })
-  isDelete: number;
+  @Column({ name: 'is_delete', default: 0 })
+  is_delete: number;
 }

@@ -1,34 +1,36 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Req,
+  UseInterceptors,
+} from '@nestjs/common';
+import { GetLoginUserIdInterceptor } from 'src/getLoginUserId.interceptor';
 import { CartService } from './cart.service';
-import { CreateCartDto } from './dto/create-cart.dto';
-import { UpdateCartDto } from './dto/update-cart.dto';
 
-@Controller('cart')
+@Controller('api/cart')
 export class CartController {
   constructor(private readonly cartService: CartService) {}
-
-  @Post()
-  create(@Body() createCartDto: CreateCartDto) {
-    return this.cartService.create(createCartDto);
+  // 获取购物车商品的总件件数
+  @Get('goodsCount')
+  @UseInterceptors(GetLoginUserIdInterceptor)
+  goodsCountAction(@Req() request) {
+    const { id: userId } = request.user || {};
+    return this.cartService.goodsCountAction(userId);
   }
-
-  @Get()
-  findAll() {
-    return this.cartService.findAll();
+  // 获取购物车信息，所有对购物车的增删改操作，都要重新返回购物车的信息
+  @Get('index')
+  @UseInterceptors(GetLoginUserIdInterceptor)
+  indexAction(@Req() request) {
+    const { id: userId } = request.user || {};
+    return this.cartService.indexAction(userId);
   }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.cartService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCartDto: UpdateCartDto) {
-    return this.cartService.update(+id, updateCartDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.cartService.remove(+id);
+  // 添加商品到购物车
+  @Post('add')
+  @UseInterceptors(GetLoginUserIdInterceptor)
+  addAction(@Body() payload, @Req() request) {
+    const { id: userId } = request.user || {};
+    return this.cartService.addAction(payload, userId);
   }
 }
