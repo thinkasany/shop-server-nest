@@ -33,4 +33,18 @@ export class CartController {
     const { id: userId } = request.user || {};
     return this.cartService.addAction(payload, userId);
   }
+  // 更新指定的购物车信息
+  @Post('update')
+  @UseInterceptors(GetLoginUserIdInterceptor)
+  updateAction(@Body() payload, @Req() request) {
+    const { id: userId } = request.user || {};
+    return this.cartService.updateAction(payload, userId);
+  }
+  // 删除选中的购物车商品，批量删除
+  @Post('delete')
+  @UseInterceptors(GetLoginUserIdInterceptor)
+  deleteAction(@Body() payload, @Req() request) {
+    const { id: userId } = request.user || {};
+    return this.cartService.deleteAction(payload, userId);
+  }
 }

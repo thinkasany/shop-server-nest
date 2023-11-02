@@ -135,6 +135,49 @@ export class CartService {
       }
     }
   }
+
+  async updateAction(payload, userId) {
+    const { productId, number, id } = payload;
+    // 取得规格的信息,判断规格库存
+    const productInfo = await this.productRepository.findOne({
+      where: { id: productId, is_delete: 0 },
+    });
+    if (!productInfo || productInfo.goods_number < number) {
+      throw new HttpException('库存不足', 500);
+    }
+    // 判断是否已经存在product_id购物车商品
+    const cartInfo = await this.cartRepository.findOne({
+      where: {
+        id,
+        is_delete: 0,
+      },
+    });
+    // 只是更新number
+    if (cartInfo.product_id === productId) {
+      await this.cartRepository.update(
+        {
+          id,
+          is_delete: 0,
+        },
+        { number },
+      );
+      return await this.getCart(0, userId);
+    }
+  }
+
+  async deleteAction(payload, userId) {
+    const { productIds } = payload;
+    if (!productIds) {
+      console.log(productIds);
+      throw new HttpException('删除出错', 500);
+    }
+    await this.cartRepository.update(
+      { product_id: productIds, user_id: userId, is_delete: 0 },
+      { is_delete: 1 },
+    );
+    return await this.getCart(0, userId);
+  }
+
   async getCart(type, userId) {
     console.log(type, userId);
     let cartList = [];
@@ -156,11 +199,87 @@ export class CartService {
       });
     }
     // 获取购物车统计信息
-    const goodsCount = 0;
+    let goodsCount = 0;
+    let goodsAmount = 0;
+    let checkedGoodsCount = 0;
+    let checkedGoodsAmount = 0;
+    let numberChange = 0;
+
+    for (const cartItem of cartList) {
+      const product = await this.productRepository.findOne({
+        where: {
+          id: cartItem.product_id,
+          is_delete: 0,
+        },
+      });
+      if (!product) {
+        await this.cartRepository.update(
+          {
+            product_id: cartItem.product_id,
+            user_id: userId,
+            is_delete: 0,
+          },
+          {
+            is_delete: 1,
+          },
+        );
+      } else {
+        const retail_price = product.retail_price;
+        const productNum = product.goods_number;
+        if (productNum <= 0 || product.is_on_sale === 0) {
+          await this.cartRepository.update(
+            {
+              product_id: cartItem.product_id,
+              user_id: userId,
+              checked: 1,
+              is_delete: 0,
+            },
+            { checked: 0 },
+          );
+          cartItem.number = 0;
+        } else if (productNum > 0 && productNum < cartItem.number) {
+          cartItem.number = productNum;
+          numberChange = 1;
+        } else if (productNum > 0 && cartItem.number === 0) {
+          cartItem.number = 1;
+          numberChange = 1;
+        }
+        goodsCount += cartItem.number;
+        goodsAmount += cartItem.number * retail_price;
+        if (cartItem.checked && productNum > 0) {
+          checkedGoodsCount += cartItem.number;
+          checkedGoodsAmount += cartItem.number * Number(retail_price);
+        }
+        // 查找商品的图片
+        const info = await this.goodsRepository.findOne({
+          where: { id: cartItem.goodsId },
+          select: ['list_pic_url'],
+        });
+        cartItem.list_pic_url = info.list_pic_url;
+        cartItem.weight_count = cartItem.number * Number(cartItem.goods_weight);
+        await this.cartRepository.update(
+          {
+            product_id: cartItem.product_id,
+            user_id: userId,
+            is_delete: 0,
+          },
+          {
+            number: cartItem.number,
+            add_price: retail_price,
+          },
+        );
+      }
+    }
+
     return {
       cartList,
       cartTotal: {
         goodsCount,
+        goodsAmount: goodsAmount.toFixed(2),
+        checkedGoodsCount,
+        checkedGoodsAmount: checkedGoodsAmount.toFixed(2),
+        user_id: userId,
+        numberChange,
       },
     };
   }
