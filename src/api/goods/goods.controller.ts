@@ -27,4 +27,25 @@ export class GoodsController {
     const { id: userId } = request.user || {};
     return this.goodsService.detailAction(id, userId);
   }
+
+  // 获取商品列表
+  @Get('list')
+  listAction(
+    @Query('keyword') keyword: string,
+    @Query('sort') sort: string,
+    @Query('order') order: string,
+    @Query('sales') sales: string,
+    @Req() request,
+  ) {
+    const { id: userId } = request.user || {};
+    return this.goodsService.listAction(
+      {
+        keyword,
+        sort,
+        order,
+        sales,
+      },
+      userId,
+    );
+  }
 }

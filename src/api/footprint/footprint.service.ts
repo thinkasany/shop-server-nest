@@ -48,7 +48,7 @@ export class FootprintService {
         },
       });
       item.goods = goods;
-      const isToday = dayjs().isSame(dayjs.unix(item.addTime), 'day');
+      const isToday = dayjs().isSame(dayjs.unix(item.add_time), 'day');
       if (isToday) {
         item.add_time = '今天';
       }

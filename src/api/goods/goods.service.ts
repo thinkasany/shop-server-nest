@@ -1,6 +1,6 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Like } from 'typeorm';
 import { ShopCommentEntity } from './entities/comment.entity';
 import { GoodsEntity } from './entities/good.entity';
 import { GoodsGalleryEntity } from './entities/goodsGallery.entity';
@@ -9,6 +9,7 @@ import { ProductEntity } from './entities/product.entity';
 import { SpecificationEntity } from './entities/specification.entity';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { FootprintService } from '../footprint/footprint.service';
+import { ShopSearchHistoryEntity } from '../search/entities/shopSearchHistory.entity';
 @Injectable()
 export class GoodsService {
   constructor(
@@ -24,6 +25,8 @@ export class GoodsService {
     private readonly specificationRepository: Repository<SpecificationEntity>,
     @InjectRepository(ShopCommentEntity)
     private readonly commentRepository: Repository<ShopCommentEntity>,
+    @InjectRepository(ShopSearchHistoryEntity)
+    private readonly shopSearchHistoryEntityRepository: Repository<ShopSearchHistoryEntity>,
     private FootprintService: FootprintService,
   ) {}
 
@@ -125,5 +128,47 @@ export class GoodsService {
       },
     });
     return info;
+  }
+
+  async listAction(payload, userId) {
+    const { keyword, sort, order, sales } = payload;
+    const whereMap: { [key: string]: any } = {
+      is_on_sale: 1,
+      is_delete: 0,
+    };
+    if (keyword) {
+      whereMap.name = Like(`%${keyword}%`);
+      await this.shopSearchHistoryEntityRepository.insert({
+        keyword,
+        user_id: userId,
+        add_time: Number(new Date().getTime() / 1000),
+      });
+      //   fixme： TODO 之后要做个判断，这个词在搜索记录中的次数，如果大于某个值，则将他存入keyword
+    }
+    // 排序
+    let orderMap = {};
+    if (sort === 'price') {
+      // 按价格
+      orderMap = {
+        retail_price: order,
+      };
+    } else if (sort === 'sales') {
+      // 按价格
+      orderMap = {
+        sell_volume: sales,
+      };
+    } else {
+      // 按商品添加时间
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      orderMap = {
+        sort_order: 'asc',
+      };
+    }
+
+    const goodsData = await this.goodsRepository.find({
+      where: whereMap,
+      order: orderMap,
+    });
+    return goodsData;
   }
 }

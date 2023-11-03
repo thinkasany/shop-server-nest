@@ -11,6 +11,7 @@ import { ShopCommentEntity } from './entities/comment.entity';
 import { OrderGoodsEntity } from './entities/orderGoods.entity';
 import { FootprintService } from '../footprint/footprint.service';
 import { FootprintEntity } from '../footprint/entities/footprint.entity';
+import { ShopSearchHistoryEntity } from '../search/entities/shopSearchHistory.entity';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { FootprintEntity } from '../footprint/entities/footprint.entity';
       ShopCommentEntity,
       OrderGoodsEntity,
       FootprintEntity,
+      ShopSearchHistoryEntity,
     ]),
   ],
   controllers: [GoodsController],
