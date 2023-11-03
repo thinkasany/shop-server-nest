@@ -1,4 +1,12 @@
-import { Controller, Get, Query, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { LoginGuard } from 'src/login.guard';
 import { FootprintService } from './footprint.service';
 
@@ -13,17 +21,14 @@ export class FootprintController {
     @Query('size') size: number,
     @Req() request,
   ) {
-    const { user_id: userId } = request.user;
+    const { id: userId } = request.user;
     return this.footprintService.listAction({ page, size, userId });
   }
 
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.footprintService.findOne(+id);
-  // }
-
-  //   @Post()
-  //   create(@Body() createFootprintDto: CreateFootprintDto) {
-  //     return this.footprintService.create(createFootprintDto);
-  //   }
+  @Post('delete')
+  @UseGuards(LoginGuard)
+  create(@Body() payload, @Req() request) {
+    const { id: userId } = request.user;
+    return this.footprintService.deleteAction({ ...payload, userId });
+  }
 }

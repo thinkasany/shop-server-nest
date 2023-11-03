@@ -8,6 +8,8 @@ import { ProductEntity } from '../goods/entities/product.entity';
 import { GoodsSpecificationEntity } from '../goods/entities/goodsSpecification.entity';
 import { AddressEntity } from '../address/entities/address.entity';
 import { OrderGoodsEntity } from '../goods/entities/orderGoods.entity';
+import { AddressService } from '../address/address.service';
+import { RegionEntity } from '../region/entities/region.entity';
 
 @Module({
   imports: [
@@ -18,9 +20,10 @@ import { OrderGoodsEntity } from '../goods/entities/orderGoods.entity';
       GoodsSpecificationEntity,
       OrderGoodsEntity,
       AddressEntity,
+      RegionEntity,
     ]),
   ],
   controllers: [CartController],
-  providers: [CartService],
+  providers: [CartService, AddressService],
 })
 export class CartModule {}

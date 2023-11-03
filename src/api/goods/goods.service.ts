@@ -7,6 +7,8 @@ import { GoodsGalleryEntity } from './entities/goodsGallery.entity';
 import { GoodsSpecificationEntity } from './entities/goodsSpecification.entity';
 import { ProductEntity } from './entities/product.entity';
 import { SpecificationEntity } from './entities/specification.entity';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { FootprintService } from '../footprint/footprint.service';
 @Injectable()
 export class GoodsService {
   constructor(
@@ -22,6 +24,7 @@ export class GoodsService {
     private readonly specificationRepository: Repository<SpecificationEntity>,
     @InjectRepository(ShopCommentEntity)
     private readonly commentRepository: Repository<ShopCommentEntity>,
+    private FootprintService: FootprintService,
   ) {}
 
   async indexAction() {
@@ -57,12 +60,8 @@ export class GoodsService {
       take: 6, // 限制结果数量
     });
 
-    // fixme: 增加足迹
-    console.log(userId);
-    // await this.model("footprint").addFootprint(userId, goodsId);
-    // console.log(id, userId, info);
-    // console.log(id, userId, gallery);
-    // console.log(id, userId, productList);
+    // 添加足迹
+    await this.FootprintService.addFootprint(userId, id);
 
     const productList = await this.productRepository.find({
       where: { goods_id: id, is_delete: 0 },

@@ -8,7 +8,7 @@ import { GoodsSpecificationEntity } from '../goods/entities/goodsSpecification.e
 import { OrderGoodsEntity } from '../goods/entities/orderGoods.entity';
 import { ProductEntity } from '../goods/entities/product.entity';
 import { CartEntity } from './entities/cart.entity';
-
+import { AddressService } from '../address/address.service';
 @Injectable()
 export class CartService {
   constructor(
@@ -24,6 +24,7 @@ export class CartService {
     private readonly orderGoodsRepository: Repository<OrderGoodsEntity>,
     @InjectRepository(AddressEntity)
     private readonly addressRepository: Repository<AddressEntity>,
+    private AddressService: AddressService,
   ) {}
   /** 获取购物车信息，所有对购物车的增删改操作，都要重新返回购物车的信息 */
   async indexAction(userId) {
@@ -184,6 +185,24 @@ export class CartService {
     return await this.getCart(0, userId);
   }
 
+  async checkedAction(payload, userId) {
+    const { productIds, isChecked } = payload;
+    let productId: string | string[] = String(productIds);
+    if (!productId) {
+      throw new HttpException('删除出错', 500);
+    }
+    productId = productId.split(',');
+    await this.cartRepository.update(
+      {
+        product_id: In(productId),
+        user_id: userId,
+        is_delete: 0,
+      },
+      { checked: parseInt(isChecked) },
+    );
+    return await this.getCart(0, userId);
+  }
+
   async checkoutAction(payload, userId) {
     const { addressId, addType, orderFrom, type } = payload;
     let goodsCount = 0; // 购物车的数量
@@ -226,7 +245,7 @@ export class CartService {
     // 选择的收货地址
     let checkedAddress = null;
     if (addressId == '' || addressId == 0) {
-      checkedAddress = await this.addressRepository.find({
+      checkedAddress = await this.addressRepository.findOne({
         where: {
           is_default: 1,
           user_id: userId,
@@ -234,7 +253,7 @@ export class CartService {
         },
       });
     } else {
-      checkedAddress = await this.addressRepository.find({
+      checkedAddress = await this.addressRepository.findOne({
         where: {
           id: addressId,
           user_id: userId,
@@ -242,8 +261,21 @@ export class CartService {
         },
       });
     }
-
     // fixme: 运费模块
+    checkedAddress.province_name = await this.AddressService.getRegionName(
+      checkedAddress.province_id,
+    );
+    checkedAddress.city_name = await this.AddressService.getRegionName(
+      checkedAddress.city_id,
+    );
+    checkedAddress.district_name = await this.AddressService.getRegionName(
+      checkedAddress.district_id,
+    );
+    checkedAddress.full_region =
+      checkedAddress.province_name +
+      checkedAddress.city_name +
+      checkedAddress.district_name;
+
     // 计算订单的费用
     const goodsTotalPrice = cartData.cartTotal.checkedGoodsAmount; // 商品总价
     // 获取是否有可用红包

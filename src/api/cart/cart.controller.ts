@@ -63,4 +63,12 @@ export class CartController {
     const payload = { addressId, addType, orderFrom, type };
     return this.cartService.checkoutAction(payload, userId);
   }
+
+  // 是否选择商品，如果已经选择，则取消选择，批量操作
+  @Post('checked')
+  @UseInterceptors(GetLoginUserIdInterceptor)
+  checkedAction(@Body() payload, @Req() request) {
+    const { id: userId } = request.user || {};
+    return this.cartService.checkedAction(payload, userId);
+  }
 }

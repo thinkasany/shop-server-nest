@@ -6,11 +6,11 @@ export class FootprintEntity {
   id: number;
 
   @Column({ name: 'user_id' })
-  userId: number;
+  user_id: number;
 
   @Column({ name: 'goods_id' })
-  goodsId: number;
+  goods_id: number;
 
   @Column({ name: 'add_time' })
-  addTime: number;
+  add_time: number;
 }
