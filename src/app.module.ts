@@ -14,6 +14,7 @@ import { CatalogModule } from './api/catalog/catalog.module';
 import { IndexModule } from './api/index/index.module';
 import { CartModule } from './api/cart/cart.module';
 import { SearchModule } from './api/search/search.module';
+import { AdminAuthModule } from './admin/auth/auth.module';
 import * as path from 'path';
 
 @Module({
@@ -53,6 +54,7 @@ import * as path from 'path';
     IndexModule,
     CartModule,
     SearchModule,
+    AdminAuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
