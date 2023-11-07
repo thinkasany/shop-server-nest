@@ -17,6 +17,7 @@ import { SearchModule } from './api/search/search.module';
 import { AdminAuthModule } from './admin/auth/auth.module';
 import { UserModule } from './admin/user/user.module';
 import { AdminModule } from './admin/admin/admin.module';
+import { NoticeModule } from './admin/notice/notice.module';
 import * as path from 'path';
 
 @Module({
@@ -59,6 +60,7 @@ import * as path from 'path';
     AdminAuthModule,
     UserModule,
     AdminModule,
+    NoticeModule,
   ],
   controllers: [AppController],
   providers: [AppService],
