@@ -30,6 +30,7 @@ export class GoodsController {
 
   // 获取商品列表
   @Get('list')
+  @UseInterceptors(GetLoginUserIdInterceptor)
   listAction(
     @Query('keyword') keyword: string,
     @Query('sort') sort: string,
