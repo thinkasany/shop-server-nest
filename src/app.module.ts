@@ -20,6 +20,7 @@ import { AdminModule } from './admin/admin/admin.module';
 import { NoticeModule } from './admin/notice/notice.module';
 import { AdModule } from './admin/ad/ad.module';
 import { ShopcartModule } from './admin/shopcart/shopcart.module';
+import { CommentModule } from './admin/comment/comment.module';
 import * as path from 'path';
 
 @Module({
@@ -65,6 +66,7 @@ import * as path from 'path';
     NoticeModule,
     AdModule,
     ShopcartModule,
+    CommentModule,
   ],
   controllers: [AppController],
   providers: [AppService],

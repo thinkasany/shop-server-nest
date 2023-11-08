@@ -10,13 +10,13 @@ export class ShopCommentEntity {
   content: string;
 
   @Column({ type: 'int' })
-  goods_id: number;
+  goods_id: number | string;
 
   @Column({ type: 'json', nullable: true })
-  image_url: string[];
+  image_url: string[] | string;
 
   @Column({ type: 'tinyint', unsigned: true, default: 0 })
-  enabled: number;
+  enabled: number | boolean;
 
   @Column({ type: 'tinyint' })
   sort_order: number;
