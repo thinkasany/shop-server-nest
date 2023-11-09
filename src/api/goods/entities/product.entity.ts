@@ -33,8 +33,9 @@ export class ProductEntity {
   goods_name: string;
 
   @Column({ type: 'tinyint', unsigned: true })
-  is_on_sale: number;
+  is_on_sale: number | string;
 
   @Column({ type: 'tinyint', unsigned: true })
   is_delete: number;
+  value: string;
 }

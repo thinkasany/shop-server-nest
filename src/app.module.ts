@@ -22,6 +22,7 @@ import { AdModule } from './admin/ad/ad.module';
 import { ShopcartModule } from './admin/shopcart/shopcart.module';
 import { CommentModule } from './admin/comment/comment.module';
 import { CategoryModule } from './admin/category/category.module';
+import { AdminGoodsModule } from './admin/goods/goods.module';
 import * as path from 'path';
 
 @Module({
@@ -50,6 +51,7 @@ import * as path from 'path';
         authPlugin: 'sha256_password',
       },
     }),
+    AdminGoodsModule,
     GoodsModule,
     SettingsModule,
     AuthModule,
