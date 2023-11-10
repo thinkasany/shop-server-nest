@@ -23,6 +23,7 @@ import { ShopcartModule } from './admin/shopcart/shopcart.module';
 import { CommentModule } from './admin/comment/comment.module';
 import { CategoryModule } from './admin/category/category.module';
 import { AdminGoodsModule } from './admin/goods/goods.module';
+import { AdminIndexModule } from './admin/index/index.module';
 import * as path from 'path';
 
 @Module({
@@ -52,6 +53,7 @@ import * as path from 'path';
       },
     }),
     AdminGoodsModule,
+    AdminIndexModule,
     GoodsModule,
     SettingsModule,
     AuthModule,
