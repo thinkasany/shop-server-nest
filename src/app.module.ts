@@ -24,6 +24,8 @@ import { CommentModule } from './admin/comment/comment.module';
 import { CategoryModule } from './admin/category/category.module';
 import { AdminGoodsModule } from './admin/goods/goods.module';
 import { AdminIndexModule } from './admin/index/index.module';
+import { AdminOrderModule } from './admin/order/order.module';
+import { ShipperModule } from './admin/shipper/shipper.module';
 import * as path from 'path';
 
 @Module({
@@ -54,6 +56,7 @@ import * as path from 'path';
     }),
     AdminGoodsModule,
     AdminIndexModule,
+    AdminOrderModule,
     GoodsModule,
     SettingsModule,
     AuthModule,
@@ -73,6 +76,7 @@ import * as path from 'path';
     ShopcartModule,
     CommentModule,
     CategoryModule,
+    ShipperModule,
   ],
   controllers: [AppController],
   providers: [AppService],

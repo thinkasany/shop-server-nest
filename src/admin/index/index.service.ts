@@ -363,8 +363,6 @@ export class IndexService {
       payOrderNum,
       payOrderSum,
     };
-    console.log(info);
-
     return info;
   }
 }
