@@ -4,6 +4,8 @@ import { RegionEntity } from 'src/api/region/entities/region.entity';
 import { SettingsEntity } from 'src/api/settings/entities/setting.entity';
 import { Repository, Like, Not, In } from 'typeorm';
 import { ShopFreightTemplateEntity } from '../goods/entities/freightTemplate.entity';
+import { ExceptAreaEntity } from './entities/exceptArea.entity';
+import { ExceptAreaDetailEntity } from './entities/exceptAreaDetail.entity';
 import { FreightTemplateGroupEntity } from './entities/freightTemplateGroup.entity';
 import { ShipperEntity } from './entities/shipper.entity';
 
@@ -19,6 +21,10 @@ export class ShipperService {
   private readonly freightTemplateGroupRepository: Repository<FreightTemplateGroupEntity>;
   @InjectRepository(RegionEntity)
   private readonly regionRepository: Repository<RegionEntity>;
+  @InjectRepository(ExceptAreaEntity)
+  private readonly exceptAreaRepository: Repository<ExceptAreaEntity>;
+  @InjectRepository(ExceptAreaDetailEntity)
+  private readonly exceptAreaDetailRepository: Repository<ExceptAreaDetailEntity>;
   async indexAction() {
     const info = await this.shipperRepository.find({
       where: {
@@ -146,5 +152,59 @@ export class ShipperService {
       select: ['id', 'name'],
     });
     return all;
+  }
+
+  async exceptareaAction() {
+    const data = await this.exceptAreaRepository.find({
+      where: {
+        is_delete: 0,
+      },
+    });
+    for (const item of data) {
+      const area = item.area;
+      const areaData = area.split(',');
+      const info = await this.regionRepository.find({
+        where: {
+          id: In(areaData),
+        },
+        select: ['name'],
+      });
+      item.areaName = info.map((item) => item.name).join(',');
+    }
+    return data;
+  }
+  async addExceptAreaAction(payload) {
+    const { table, info } = payload;
+    const data = {
+      area: table[0].area.substring(2),
+      content: info.content,
+    };
+    const exceptArea = this.exceptAreaRepository.create(data);
+    await this.exceptAreaRepository.save(exceptArea);
+  }
+  async exceptAreaDeleteAction(payload) {
+    const { id } = payload;
+    await this.exceptAreaRepository.update(
+      {
+        id,
+      },
+      { is_delete: 1 },
+    );
+    await this.exceptAreaDetailRepository.update(
+      {
+        except_area_id: id,
+      },
+      { is_delete: 1 },
+    );
+  }
+  async exceptAreaDetailAction(payload) {
+    const { id } = payload;
+    const data = await this.exceptAreaRepository.find({
+      where: {
+        id,
+        is_delete: 0,
+      },
+    });
+    console.log('===', data);
   }
 }

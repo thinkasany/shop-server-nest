@@ -7,6 +7,8 @@ import { SettingsEntity } from 'src/api/settings/entities/setting.entity';
 import { ShopFreightTemplateEntity } from '../goods/entities/freightTemplate.entity';
 import { FreightTemplateGroupEntity } from './entities/freightTemplateGroup.entity';
 import { RegionEntity } from 'src/api/region/entities/region.entity';
+import { ExceptAreaEntity } from './entities/exceptArea.entity';
+import { ExceptAreaDetailEntity } from './entities/exceptAreaDetail.entity';
 
 @Module({
   imports: [
@@ -16,6 +18,8 @@ import { RegionEntity } from 'src/api/region/entities/region.entity';
       ShopFreightTemplateEntity,
       FreightTemplateGroupEntity,
       RegionEntity,
+      ExceptAreaEntity,
+      ExceptAreaDetailEntity,
     ]),
   ],
   controllers: [ShipperController],

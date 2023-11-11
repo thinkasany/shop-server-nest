@@ -41,4 +41,20 @@ export class ShipperController {
   getareadataAction() {
     return this.shipperService.getareadataAction();
   }
+  @Get('exceptarea')
+  exceptareaAction() {
+    return this.shipperService.exceptareaAction();
+  }
+  @Post('addExceptArea')
+  addExceptAreaAction(@Body() payload) {
+    return this.shipperService.addExceptAreaAction(payload);
+  }
+  @Post('exceptAreaDetail')
+  exceptAreaDetailAction(@Body() payload) {
+    return this.shipperService.exceptAreaDetailAction(payload);
+  }
+  @Post('exceptAreaDelete')
+  exceptAreaDeleteAction(@Body() payload) {
+    return this.shipperService.exceptAreaDeleteAction(payload);
+  }
 }
