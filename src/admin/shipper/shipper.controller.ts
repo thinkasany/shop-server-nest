@@ -25,8 +25,20 @@ export class ShipperController {
   infoAction(@Query('id') id) {
     return this.shipperService.infoAction({ id });
   }
+  @Get('freight')
+  freightAction() {
+    return this.shipperService.freightAction();
+  }
   @Post('store')
   storeAction(@Body() payload) {
     return this.shipperService.storeAction(payload);
+  }
+  @Post('freightdetail')
+  freightdetailAction(@Body() payload) {
+    return this.shipperService.freightdetailAction(payload);
+  }
+  @Post('getareadata')
+  getareadataAction() {
+    return this.shipperService.getareadataAction();
   }
 }
