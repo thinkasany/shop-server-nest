@@ -9,6 +9,7 @@ import { FreightTemplateGroupEntity } from './entities/freightTemplateGroup.enti
 import { RegionEntity } from 'src/api/region/entities/region.entity';
 import { ExceptAreaEntity } from './entities/exceptArea.entity';
 import { ExceptAreaDetailEntity } from './entities/exceptAreaDetail.entity';
+import { FreightTemplateDetailEntity } from './entities/freightTemplateDetail.entity';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { ExceptAreaDetailEntity } from './entities/exceptAreaDetail.entity';
       RegionEntity,
       ExceptAreaEntity,
       ExceptAreaDetailEntity,
+      FreightTemplateDetailEntity,
     ]),
   ],
   controllers: [ShipperController],

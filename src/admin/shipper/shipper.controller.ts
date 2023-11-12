@@ -57,4 +57,8 @@ export class ShipperController {
   exceptAreaDeleteAction(@Body() payload) {
     return this.shipperService.exceptAreaDeleteAction(payload);
   }
+  @Post('saveTable')
+  saveTableAction(@Body() payload) {
+    return this.shipperService.saveTableAction(payload);
+  }
 }
