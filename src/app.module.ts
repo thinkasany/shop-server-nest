@@ -14,6 +14,18 @@ import { CatalogModule } from './api/catalog/catalog.module';
 import { IndexModule } from './api/index/index.module';
 import { CartModule } from './api/cart/cart.module';
 import { SearchModule } from './api/search/search.module';
+import { AdminAuthModule } from './admin/auth/auth.module';
+import { UserModule } from './admin/user/user.module';
+import { AdminModule } from './admin/admin/admin.module';
+import { NoticeModule } from './admin/notice/notice.module';
+import { AdModule } from './admin/ad/ad.module';
+import { ShopcartModule } from './admin/shopcart/shopcart.module';
+import { CommentModule } from './admin/comment/comment.module';
+import { CategoryModule } from './admin/category/category.module';
+import { AdminGoodsModule } from './admin/goods/goods.module';
+import { AdminIndexModule } from './admin/index/index.module';
+import { AdminOrderModule } from './admin/order/order.module';
+import { ShipperModule } from './admin/shipper/shipper.module';
 import * as path from 'path';
 
 @Module({
@@ -42,6 +54,9 @@ import * as path from 'path';
         authPlugin: 'sha256_password',
       },
     }),
+    AdminGoodsModule,
+    AdminIndexModule,
+    AdminOrderModule,
     GoodsModule,
     SettingsModule,
     AuthModule,
@@ -53,6 +68,15 @@ import * as path from 'path';
     IndexModule,
     CartModule,
     SearchModule,
+    AdminAuthModule,
+    UserModule,
+    AdminModule,
+    NoticeModule,
+    AdModule,
+    ShopcartModule,
+    CommentModule,
+    CategoryModule,
+    ShipperModule,
   ],
   controllers: [AppController],
   providers: [AppService],

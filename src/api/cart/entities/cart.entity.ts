@@ -61,4 +61,5 @@ export class CartEntity {
 
   @Column({ name: 'is_delete', default: 0 })
   is_delete: number;
+  nickname: string;
 }

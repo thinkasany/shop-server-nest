@@ -12,7 +12,7 @@ export class GoodsEntity {
   category_id: number;
 
   @Column({ type: 'tinyint', unsigned: true, default: 1 })
-  is_on_sale: number;
+  is_on_sale: number | boolean;
 
   @Column({ type: 'varchar', length: 120 })
   name: string;
@@ -48,7 +48,7 @@ export class GoodsEntity {
   sort_order: number;
 
   @Column({ type: 'tinyint', width: 1, default: 0 })
-  is_index: number;
+  is_index: number | boolean;
 
   @Column({ type: 'tinyint', width: 1, default: 0 })
   is_new: number;
@@ -70,4 +70,6 @@ export class GoodsEntity {
 
   @Column({ type: 'tinyint', unsigned: true, default: 0 })
   is_delete: number;
+  category_name: string;
+  product: any;
 }
