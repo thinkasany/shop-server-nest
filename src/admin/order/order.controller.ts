@@ -1,9 +1,9 @@
-import { Controller, Get, Post, Body, Query } from '@nestjs/common';
-import { OrderService } from './order.service';
+import { Controller, Get, Query } from '@nestjs/common';
+import { AdminOrderService } from './order.service';
 
 @Controller('admin/order')
 export class OrderController {
-  constructor(private readonly orderService: OrderService) {}
+  constructor(private readonly orderService: AdminOrderService) {}
 
   @Get('getAllRegion')
   getAllRegionAction() {

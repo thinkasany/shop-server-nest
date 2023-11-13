@@ -12,10 +12,17 @@ export class OrderController {
   listAction(
     @Query('page') page: number,
     @Query('size') size: number,
+    @Query('showType') showType: number,
     @Req() request,
   ) {
-    const { user_id: userId } = request.user;
-    return this.orderService.listAction({ userId, page, size });
+    const { id: userId } = request.user;
+    return this.orderService.listAction({ userId, page, size, showType });
+  }
+  @Get('orderCount')
+  @UseGuards(LoginGuard)
+  orderCountAction(@Req() request) {
+    const { id: userId } = request.user;
+    return this.orderService.orderCountAction({ userId });
   }
 
   // @Post()

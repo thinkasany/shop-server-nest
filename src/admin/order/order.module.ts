@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { OrderService } from './order.service';
+import { AdminOrderService } from './order.service';
 import { OrderController } from './order.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { RegionEntity } from 'src/api/region/entities/region.entity';
@@ -21,6 +21,6 @@ import { ShopUserEntity } from '../user/entities/user.entity';
     ]),
   ],
   controllers: [OrderController],
-  providers: [OrderService],
+  providers: [AdminOrderService],
 })
 export class AdminOrderModule {}
