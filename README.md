@@ -16,6 +16,8 @@ SECRET = "" # 小程序密钥
 由于功能比较多，需要后续开发的会加上fixme 注意后续的修复工作
 fixme
 
+要删除fixme mock
+
 1. 全局的错误提示需要做一个 throw new HttpException('请求失败', 500);
 2. /* eslint-disable @typescript-eslint/no-unused-vars */ 这个看着就有问题 let 的怎么就没调用了
 3. entity的对照着修改一下 下划线还是驼峰要注意检查

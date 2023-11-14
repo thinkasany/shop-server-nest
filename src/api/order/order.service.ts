@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as dayjs from 'dayjs';
 import { Repository, In, LessThan } from 'typeorm';
 import { OrderGoodsEntity } from '../goods/entities/orderGoods.entity';
 import { OrderEntity } from './entities/order.entity';
 import { AdminOrderService } from 'src/admin/order/order.service';
+import { RegionEntity } from '../region/entities/region.entity';
 
 @Injectable()
 export class OrderService {
@@ -13,6 +14,8 @@ export class OrderService {
   private readonly orderRepository: Repository<OrderEntity>;
   @InjectRepository(OrderGoodsEntity)
   private readonly orderGoodsRepository: Repository<OrderGoodsEntity>;
+  @InjectRepository(RegionEntity)
+  private readonly regionRepository: Repository<RegionEntity>;
   constructor(private AdminOrderService: AdminOrderService) {}
   async listAction(payload) {
     const { size, page, showType } = payload;
@@ -179,6 +182,224 @@ export class OrderService {
     return handleOption;
   }
   async orderCountAction(payload) {
-    console.log(payload);
+    const { userId } = payload;
+    const toPay = await this.orderRepository.count({
+      where: {
+        user_id: userId,
+        is_delete: 0,
+        order_type: LessThan(7),
+        order_status: In(['101', '801']),
+      },
+    });
+    const toDelivery = await this.orderRepository.count({
+      where: {
+        user_id: userId,
+        is_delete: 0,
+        order_type: LessThan(7),
+        order_status: 300,
+      },
+    });
+    const toReceive = await this.orderRepository.count({
+      where: {
+        user_id: userId,
+        is_delete: 0,
+        order_type: LessThan(7),
+        order_status: 301,
+      },
+    });
+    const newStatus = {
+      toPay: toPay,
+      toDelivery: toDelivery,
+      toReceive: toReceive,
+    };
+    return newStatus;
   }
+  async detailAction(payload) {
+    console.log(payload);
+    const { orderId } = payload;
+    const userId = 1099; // fixme mock
+    const orderInfo: any = await this.orderRepository.findOne({
+      where: {
+        user_id: userId,
+        id: orderId,
+      },
+    });
+    const currentTime = Number(new Date().getTime() / 1000);
+    if (!orderInfo) {
+      throw new HttpException('订单不存在', 500);
+    }
+    const province_name = await this.regionRepository.findOne({
+      where: {
+        id: orderInfo.province,
+      },
+      select: ['name'],
+    });
+
+    const city_name = await this.regionRepository.findOne({
+      where: {
+        id: orderInfo.city,
+      },
+      select: ['name'],
+    });
+    const district_name = await this.regionRepository.findOne({
+      where: {
+        id: orderInfo.district,
+      },
+      select: ['name'],
+    });
+    orderInfo.province_name = province_name.name;
+    orderInfo.city_name = city_name.name;
+    orderInfo.district_name = district_name.name;
+    orderInfo.full_region =
+      orderInfo.province_name + orderInfo.city_name + orderInfo.district_name;
+    orderInfo.postscript = Buffer.from(
+      orderInfo.postscript,
+      'base64',
+    ).toString();
+    const orderGoods = await this.orderGoodsRepository.find({
+      where: {
+        user_id: userId,
+        order_id: orderId,
+        is_delete: 0,
+      },
+    });
+    let goodsCount = 0;
+    for (const gitem of orderGoods) {
+      goodsCount += gitem.number;
+    }
+    // 订单状态的处理
+    orderInfo.order_status_text = await this.getOrderStatusText(orderId);
+    if (!orderInfo.confirm_time) {
+      orderInfo.confirm_time = 0;
+    } else {
+      orderInfo.confirm_time = dayjs
+        .unix(orderInfo.confirm_time)
+        .format('YYYY-MM-DD HH:mm:ss');
+    }
+
+    if (!orderInfo.dealdone_time) {
+      orderInfo.dealdone_time = 0;
+    } else {
+      orderInfo.dealdone_time = dayjs
+        .unix(orderInfo.dealdone_time)
+        .format('YYYY-MM-DD HH:mm:ss');
+    }
+
+    if (!orderInfo.pay_time) {
+      orderInfo.pay_time = 0;
+    } else {
+      orderInfo.pay_time = dayjs
+        .unix(orderInfo.pay_time)
+        .format('YYYY-MM-DD HH:mm:ss');
+    }
+
+    if (!orderInfo.shipping_time) {
+      orderInfo.shipping_time = 0;
+    } else {
+      orderInfo.confirm_remainTime =
+        orderInfo.shipping_time + 10 * 24 * 60 * 60;
+      orderInfo.shipping_time = dayjs
+        .unix(orderInfo.shipping_time)
+        .format('YYYY-MM-DD HH:mm:ss');
+    }
+    // 订单支付倒计时
+    if (orderInfo.order_status === 101 || orderInfo.order_status === 801) {
+      // if (moment().subtract(60, 'minutes') < moment(orderInfo.add_time)) {
+      orderInfo.final_pay_time = orderInfo.add_time + 24 * 60 * 60; //支付倒计时2小时
+      if (orderInfo.final_pay_time < currentTime) {
+        //超过时间不支付，更新订单状态为取消
+        const updateInfo = {
+          order_status: 102,
+        };
+        await this.orderRepository.update(
+          {
+            id: orderId,
+          },
+          updateInfo,
+        );
+      }
+    }
+    orderInfo.add_time = dayjs
+      .unix(orderInfo.add_time)
+      .format('YYYY-MM-DD HH:mm:ss');
+    orderInfo.order_status = '';
+    // 订单可操作的选择,删除，支付，收货，评论，退换货
+    const handleOption = await this.getOrderHandleOption(orderId);
+    const textCode = await this.getOrderTextCode(orderId);
+    return {
+      orderInfo,
+      orderGoods,
+      handleOption,
+      textCode,
+      goodsCount,
+    };
+  }
+  async getOrderStatusText(orderId) {
+    const orderInfo = await this.orderRepository.findOne({
+      where: {
+        id: orderId,
+      },
+    });
+    let statusText = '待付款';
+    switch (orderInfo.order_status) {
+      case 101:
+        statusText = '待付款';
+        break;
+      case 102:
+        statusText = '交易关闭';
+        break;
+      case 103:
+        statusText = '交易关闭'; //到时间系统自动取消
+        break;
+      case 201:
+        statusText = '待发货';
+        break;
+      case 300:
+        statusText = '待发货';
+        break;
+      case 301:
+        statusText = '已发货';
+        break;
+      case 401:
+        statusText = '交易成功'; //到时间，未收货的系统自动收货、
+        break;
+    }
+    return statusText;
+  }
+  async getOrderTextCode(orderId) {
+    const textCode = {
+      pay: false,
+      close: false,
+      delivery: false,
+      receive: false,
+      success: false,
+      countdown: false,
+    };
+    const orderInfo = await this.orderRepository.findOne({
+      where: {
+        id: orderId,
+      },
+    });
+    if (orderInfo.order_status === 101) {
+      textCode.pay = true;
+      textCode.countdown = true;
+    }
+    if (orderInfo.order_status === 102 || orderInfo.order_status === 103) {
+      textCode.close = true;
+    }
+    if (orderInfo.order_status === 201 || orderInfo.order_status === 300) {
+      //待发货
+      textCode.delivery = true;
+    }
+    if (orderInfo.order_status === 301) {
+      //已发货
+      textCode.receive = true;
+    }
+    if (orderInfo.order_status === 401) {
+      textCode.success = true;
+    }
+    return textCode;
+  }
+
+  async expressAction(payload) {}
 }

@@ -34,6 +34,18 @@ export class OrderEntity {
   @Column({ type: 'varchar', length: 60, default: '' })
   consignee: string;
 
+  @Column({ type: 'smallint', unsigned: true, default: 0 })
+  country: number;
+
+  @Column({ type: 'smallint', unsigned: true, default: 0 })
+  province: number;
+
+  @Column({ type: 'smallint', unsigned: true, default: 0 })
+  city: number;
+
+  @Column({ type: 'smallint', unsigned: true, default: 0 })
+  district: number;
+
   @Column({ type: 'varchar', length: 255, default: '0' })
   pay_id: string;
 
@@ -118,5 +130,7 @@ export class OrderEntity {
 
   @Column({ type: 'tinyint' })
   is_delete: number;
+  @Column({ type: 'varchar', length: 255, nullable: false, default: '' })
+  postscript: string;
   goods: any;
 }

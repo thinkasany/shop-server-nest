@@ -24,9 +24,17 @@ export class OrderController {
     const { id: userId } = request.user;
     return this.orderService.orderCountAction({ userId });
   }
-
-  // @Post()
-  // create(@Body() createOrderDto: CreateOrderDto) {
-  //   return this.orderService.create(createOrderDto);
-  // }
+  @Get('detail')
+  @UseGuards(LoginGuard)
+  detailAction(@Query('orderId') orderId, @Req() request) {
+    const { id: userId } = request.user;
+    return this.orderService.detailAction({ userId, orderId });
+  }
+  // 查询物流信息asd
+  @Get('express')
+  @UseGuards(LoginGuard)
+  expressAction(@Query('orderId') orderId, @Req() request) {
+    const { id: userId } = request.user;
+    return this.orderService.expressAction({ userId, orderId });
+  }
 }
