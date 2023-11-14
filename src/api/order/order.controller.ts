@@ -37,4 +37,11 @@ export class OrderController {
     const { id: userId } = request.user;
     return this.orderService.expressAction({ userId, orderId });
   }
+  // order 和 order-check 的goodslist
+  @Get('orderGoods')
+  @UseGuards(LoginGuard)
+  orderGoodsAction(@Query('orderId') orderId, @Req() request) {
+    const { id: userId } = request.user;
+    return this.orderService.orderGoodsAction({ userId, orderId });
+  }
 }

@@ -9,6 +9,7 @@ import { RegionEntity } from '../region/entities/region.entity';
 import { SettingsEntity } from '../settings/entities/setting.entity';
 import { OrderExpressEntity } from 'src/admin/order/entities/orderExpress.entity';
 import { ShopUserEntity } from 'src/admin/user/entities/user.entity';
+import { CartEntity } from '../cart/entities/cart.entity';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { ShopUserEntity } from 'src/admin/user/entities/user.entity';
       OrderExpressEntity,
       OrderGoodsEntity,
       ShopUserEntity,
+      CartEntity,
     ]),
   ],
   controllers: [OrderController],

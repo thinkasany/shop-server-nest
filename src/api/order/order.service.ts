@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as dayjs from 'dayjs';
 import { Repository, In, LessThan } from 'typeorm';
@@ -7,6 +7,9 @@ import { OrderGoodsEntity } from '../goods/entities/orderGoods.entity';
 import { OrderEntity } from './entities/order.entity';
 import { AdminOrderService } from 'src/admin/order/order.service';
 import { RegionEntity } from '../region/entities/region.entity';
+import { OrderExpressEntity } from 'src/admin/order/entities/orderExpress.entity';
+import { ApiException } from 'src/api-exception.filter';
+import { CartEntity } from '../cart/entities/cart.entity';
 
 @Injectable()
 export class OrderService {
@@ -16,6 +19,10 @@ export class OrderService {
   private readonly orderGoodsRepository: Repository<OrderGoodsEntity>;
   @InjectRepository(RegionEntity)
   private readonly regionRepository: Repository<RegionEntity>;
+  @InjectRepository(OrderExpressEntity)
+  private readonly orderExpressRepository: Repository<OrderExpressEntity>;
+  @InjectRepository(CartEntity)
+  private readonly cartRepository: Repository<CartEntity>;
   constructor(private AdminOrderService: AdminOrderService) {}
   async listAction(payload) {
     const { size, page, showType } = payload;
@@ -401,5 +408,105 @@ export class OrderService {
     return textCode;
   }
 
-  async expressAction(payload) {}
+  async expressAction(payload) {
+    const { orderId } = payload;
+    const currentTime = Number(new Date().getTime() / 1000);
+    const info = await this.orderExpressRepository.findOne({
+      where: {
+        order_id: orderId,
+      },
+    });
+    if (!info) {
+      throw new ApiException(400, '暂无物流信息', HttpStatus.BAD_REQUEST);
+    }
+    // 如果is_finish == 1；或者 updateTime 小于 1分钟，
+    const updateTime = info.update_time;
+    const com = (currentTime - updateTime) / 60;
+    const is_finish = info.is_finish;
+    const expressInfo = info;
+    if (is_finish == 1) {
+      return expressInfo;
+    } else if (updateTime != 0 && com < 20) {
+      return expressInfo;
+    } else {
+      const shipperCode = expressInfo.shipper_code;
+      const expressNo = expressInfo.logistic_code;
+      const lastExpressInfo: any = await this.getExpressInfo(
+        shipperCode,
+        expressNo,
+      );
+      let deliverystatus = lastExpressInfo.deliverystatus;
+      let newUpdateTime = lastExpressInfo.updateTime;
+      newUpdateTime = Number(new Date(newUpdateTime).getTime() / 1000);
+      deliverystatus = await this.getDeliverystatus(deliverystatus);
+      const issign = lastExpressInfo.issign;
+      let traces = lastExpressInfo.list;
+      traces = JSON.stringify(traces);
+      const dataInfo = {
+        express_status: deliverystatus,
+        is_finish: issign,
+        traces: traces,
+        update_time: newUpdateTime,
+      };
+      await this.orderExpressRepository.update(
+        {
+          order_id: orderId,
+        },
+        dataInfo,
+      );
+      const express = await this.orderExpressRepository.find({
+        where: {
+          order_id: orderId,
+        },
+      });
+      return express;
+    }
+  }
+  async getExpressInfo(shipperCode, expressNo) {}
+  async getDeliverystatus(status) {
+    if (status === 0) {
+      return '快递收件(揽件)';
+    } else if (status === 1) {
+      return '在途中';
+    } else if (status === 2) {
+      return '正在派件';
+    } else if (status === 3) {
+      return '已签收';
+    } else if (status === 4) {
+      return '派送失败(无法联系到收件人或客户要求择日派送，地址不详或手机号不清)';
+    } else if (status === 5) {
+      return '疑难件(收件人拒绝签收，地址有误或不能送达派送区域，收费等原因无法正常派送)';
+    } else if (status === 6) {
+      return '退件签收';
+    }
+  }
+
+  async orderGoodsAction(payload) {
+    const { orderId } = payload;
+    const userId = 1099; // fixmock
+    if (orderId > 0) {
+      const orderGoods = await this.orderGoodsRepository.find({
+        where: {
+          user_id: userId,
+          order_id: orderId,
+          is_delete: 0,
+        },
+      });
+      let goodsCount = 0;
+      for (const gitem of orderGoods) {
+        goodsCount += gitem.number;
+      }
+      return orderGoods;
+    } else {
+      const cartList = await this.cartRepository.find({
+        where: {
+          user_id: userId,
+          checked: 1,
+          is_delete: 0,
+          is_fast: 0,
+        },
+      });
+      return cartList;
+    }
+  }
 }
