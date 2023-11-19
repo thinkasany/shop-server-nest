@@ -4,9 +4,16 @@ import { SettingsController } from './settings.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SettingsEntity } from './entities/setting.entity';
 import { ShowSettingsEntity } from './entities/showSettings.entity';
+import { ShopUserEntity } from 'src/admin/user/entities/user.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([SettingsEntity, ShowSettingsEntity])],
+  imports: [
+    TypeOrmModule.forFeature([
+      SettingsEntity,
+      ShowSettingsEntity,
+      ShopUserEntity,
+    ]),
+  ],
   controllers: [SettingsController],
   providers: [SettingsService],
 })
