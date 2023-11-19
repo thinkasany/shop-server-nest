@@ -53,6 +53,10 @@ export class GoodsController {
   dropAction(@Query('page') page, @Query('size') size) {
     return this.goodsService.dropAction({ page, size });
   }
+  @Get('sort')
+  sortAction(@Query('page') page, @Query('size') size, @Query('index') index) {
+    return this.goodsService.sortAction({ page, size, index });
+  }
   @Post('uploadHttpsImage')
   uploadHttpsImageAction(@Body() payload) {
     return this.goodsService.uploadHttpsImageAction(payload);
@@ -64,5 +68,9 @@ export class GoodsController {
   @Post('destory')
   destoryAction(@Body() payload) {
     return this.goodsService.destoryAction(payload);
+  }
+  @Post('checkSku')
+  checkSkuAction(@Body() payload) {
+    return this.goodsService.checkSkuAction(payload);
   }
 }

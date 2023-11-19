@@ -26,6 +26,7 @@ import { AdminGoodsModule } from './admin/goods/goods.module';
 import { AdminIndexModule } from './admin/index/index.module';
 import { AdminOrderModule } from './admin/order/order.module';
 import { ShipperModule } from './admin/shipper/shipper.module';
+import { SpecificationModule } from './admin/specification/specification.module';
 import * as path from 'path';
 
 @Module({
@@ -77,6 +78,7 @@ import * as path from 'path';
     CommentModule,
     CategoryModule,
     ShipperModule,
+    SpecificationModule,
   ],
   controllers: [AppController],
   providers: [AppService],

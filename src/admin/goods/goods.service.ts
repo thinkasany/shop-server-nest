@@ -1,6 +1,6 @@
 /* eslint-disable prefer-const */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CartEntity } from 'src/api/cart/entities/cart.entity';
@@ -10,7 +10,14 @@ import { GoodsGalleryEntity } from 'src/api/goods/entities/goodsGallery.entity';
 import { GoodsSpecificationEntity } from 'src/api/goods/entities/goodsSpecification.entity';
 import { ProductEntity } from 'src/api/goods/entities/product.entity';
 import { SpecificationEntity } from 'src/api/goods/entities/specification.entity';
-import { Repository, Like, MoreThan, LessThanOrEqual } from 'typeorm';
+import {
+  Repository,
+  Like,
+  MoreThan,
+  LessThanOrEqual,
+  Not,
+  Equal,
+} from 'typeorm';
 import { ShopFreightTemplateEntity } from './entities/freightTemplate.entity';
 import * as qiniu from 'qiniu';
 import { v4 as uuid } from 'uuid';
@@ -511,6 +518,7 @@ export class GoodsService {
           is_delete: 1,
         },
       );
+      console.log('id=>', specData);
       for (const item of specData) {
         if (item.id > 0) {
           await this.cartRepository.update(
@@ -526,11 +534,12 @@ export class GoodsService {
           );
           delete item.is_delete;
           item.is_delete = 0;
+          const { value, ...restItem } = item;
           await this.productRepository.update(
             {
               id: item.id,
             },
-            item,
+            { ...restItem },
           );
           const specificationData = {
             value: item.value,
@@ -652,5 +661,98 @@ export class GoodsService {
       { goods_id: id },
       { is_delete: 1 },
     );
+  }
+  async checkSkuAction(payload) {
+    const { info } = payload;
+    if (info.id > 0) {
+      const data = await this.productRepository.find({
+        where: {
+          id: Not(Equal(info.id)),
+          goods_sn: info.goods_sn,
+          is_delete: 0,
+        },
+      });
+      if (data) {
+        throw new HttpException('重复', 500);
+      }
+    } else {
+      const data = await this.productRepository.find({
+        where: {
+          goods_sn: info.goods_sn,
+          is_delete: 0,
+        },
+      });
+      if (data) {
+        throw new HttpException('重复', 500);
+      }
+    }
+  }
+
+  async sortAction(payload) {
+    const { page = 1, size, index } = payload;
+    let orderOption = {};
+    if (index === '1') {
+      orderOption = {
+        sell_volume: 'DESC',
+      };
+    } else if (index === '2') {
+      orderOption = {
+        retail_price: 'DESC',
+      };
+    } else if (index === '3') {
+      orderOption = {
+        goods_number: 'DESC',
+      };
+    }
+    const [data, count] = await this.goodsRepository.findAndCount({
+      where: {
+        is_delete: 0,
+      },
+      order: orderOption,
+      skip: (page - 1) * size,
+      take: size,
+    });
+    // console.log(data);
+    for (const item of data) {
+      const info = await this.categoryRepository.findOne({
+        where: {
+          id: item.category_id,
+        },
+      });
+      item.category_name = info.name;
+      if (item.is_on_sale == 1) {
+        item.is_on_sale = true;
+      } else {
+        item.is_on_sale = false;
+      }
+      if (item.is_index == 1) {
+        item.is_index = true;
+      } else {
+        item.is_index = false;
+      }
+      const product = await this.productRepository.find({
+        where: {
+          goods_id: item.id,
+          is_delete: 0,
+        },
+      });
+      for (const ele of product) {
+        let spec = await this.goodsSpecificationRepository.findOne({
+          where: {
+            id: Number(ele.goods_specification_ids),
+            is_delete: 0,
+          },
+        });
+        ele.value = spec.value;
+        ele.is_on_sale = ele.is_on_sale ? '1' : '0';
+      }
+      item.product = product;
+    }
+    return {
+      data,
+      count,
+      page,
+      pageSize: size,
+    };
   }
 }
