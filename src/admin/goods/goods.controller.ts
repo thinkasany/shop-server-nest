@@ -53,4 +53,8 @@ export class GoodsController {
   dropAction(@Query('page') page, @Query('size') size) {
     return this.goodsService.dropAction({ page, size });
   }
+  @Post('uploadHttpsImage')
+  uploadHttpsImageAction(@Body() payload) {
+    return this.goodsService.uploadHttpsImageAction(payload);
+  }
 }

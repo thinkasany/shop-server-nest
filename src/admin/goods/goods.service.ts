@@ -1,5 +1,7 @@
+/* eslint-disable prefer-const */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CartEntity } from 'src/api/cart/entities/cart.entity';
 import { CategoryEntity } from 'src/api/catalog/entities/catalog.entity';
@@ -10,6 +12,8 @@ import { ProductEntity } from 'src/api/goods/entities/product.entity';
 import { SpecificationEntity } from 'src/api/goods/entities/specification.entity';
 import { Repository, Like, MoreThan, LessThanOrEqual } from 'typeorm';
 import { ShopFreightTemplateEntity } from './entities/freightTemplate.entity';
+import * as qiniu from 'qiniu';
+import { v4 as uuid } from 'uuid';
 
 @Injectable()
 export class GoodsService {
@@ -29,6 +33,7 @@ export class GoodsService {
   private readonly goodsGalleryRepository: Repository<GoodsGalleryEntity>;
   @InjectRepository(ShopFreightTemplateEntity)
   private readonly freightTemplateRepository: Repository<ShopFreightTemplateEntity>;
+  constructor(private configService: ConfigService) {}
   async indexAction(payload) {
     const { page = 1, size = 10, name = '' } = payload;
     const [data, total] = await this.goodsRepository.findAndCount({
@@ -407,5 +412,62 @@ export class GoodsService {
       item.product = product;
     }
     return data;
+  }
+  async uploadHttpsImageAction(payload) {
+    const { url } = payload;
+    const access_key = this.configService.get<string>('qiniu_access_key');
+    const secret_key = this.configService.get<string>('qiniu_secret_key');
+    const bucket = this.configService.get<string>('qiniu_bucket');
+    const domain = this.configService.get<string>('qiniu_domain');
+    const mac = new qiniu.auth.digest.Mac(access_key, secret_key);
+    let config: any = new qiniu.conf.Config();
+    const zoneNum = this.configService.get<number>('zoneNum');
+    if (zoneNum == 0) {
+      config.zone = qiniu.zone.Zone_z0;
+    } else if (zoneNum == 1) {
+      config.zone = qiniu.zone.Zone_z1;
+    } else if (zoneNum == 2) {
+      config.zone = qiniu.zone.Zone_z2;
+    } else if (zoneNum == 3) {
+      config.zone = qiniu.zone.Zone_na0;
+    } else if (zoneNum == 4) {
+      config.zone = qiniu.zone.Zone_as0;
+    }
+    const bucketManager = new qiniu.rs.BucketManager(mac, config);
+    const key = uuid(32);
+    // 公开空间访问链接
+
+    const uploadQiniu = async () => {
+      return new Promise((resolve, reject) => {
+        try {
+          bucketManager.fetch(
+            url,
+            bucket,
+            key,
+            function (err, respBody, respInfo) {
+              if (err) {
+                console.log('err', err);
+                //throw err;
+              } else {
+                if (respInfo.statusCode == 200) {
+                  resolve(respBody.key);
+                } else {
+                  console.log(respInfo);
+                  console.log('respInfo.statusCode', respInfo.statusCode);
+                }
+              }
+            },
+          );
+        } catch (e) {
+          return resolve(null);
+        }
+      });
+    };
+    const httpsUrl = await uploadQiniu();
+    let lastUrl = domain + httpsUrl;
+    console.log('httpsUrl', httpsUrl, lastUrl);
+    return {
+      lastUrl,
+    };
   }
 }

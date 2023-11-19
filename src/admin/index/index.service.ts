@@ -7,20 +7,26 @@ import { SettingsEntity } from 'src/api/settings/entities/setting.entity';
 import { Repository, MoreThan, LessThan, In, Between } from 'typeorm';
 import { ShopUserEntity } from '../user/entities/user.entity';
 import { OrderEntity } from './entities/order.entity';
+import { ConfigService } from '@nestjs/config';
+import * as qiniu from 'qiniu';
+import { v4 as uuid } from 'uuid';
 import * as dayjs from 'dayjs';
 
 @Injectable()
 export class IndexService {
-  @InjectRepository(GoodsEntity)
-  private readonly goodsRepository: Repository<GoodsEntity>;
-  @InjectRepository(OrderEntity)
-  private readonly orderRepository: Repository<OrderEntity>;
-  @InjectRepository(ShopUserEntity)
-  private readonly userRepository: Repository<ShopUserEntity>;
-  @InjectRepository(SettingsEntity)
-  private readonly settingsRepository: Repository<SettingsEntity>;
-  @InjectRepository(CartEntity)
-  private readonly cartRepository: Repository<CartEntity>;
+  constructor(
+    @InjectRepository(GoodsEntity)
+    private readonly goodsRepository: Repository<GoodsEntity>,
+    @InjectRepository(OrderEntity)
+    private readonly orderRepository: Repository<OrderEntity>,
+    @InjectRepository(ShopUserEntity)
+    private readonly userRepository: Repository<ShopUserEntity>,
+    @InjectRepository(SettingsEntity)
+    private readonly settingsRepository: Repository<SettingsEntity>,
+    @InjectRepository(CartEntity)
+    private readonly cartRepository: Repository<CartEntity>,
+    private configService: ConfigService,
+  ) {}
   async indexAction() {
     const goodsOnsale = await this.goodsRepository.count({
       where: {
@@ -363,6 +369,29 @@ export class IndexService {
       payOrderNum,
       payOrderSum,
     };
+    return info;
+  }
+  async getQiniuTokenAction() {
+    const access_key = this.configService.get<string>('qiniu_access_key');
+    const secret_key = this.configService.get<string>('qiniu_secret_key');
+    const bucket = this.configService.get<string>('qiniu_bucket');
+    const domain = this.configService.get<string>('qiniu_domain');
+    const mac = new qiniu.auth.digest.Mac(access_key, secret_key);
+    const currentTime = Number(new Date().getTime() / 1000) + 600;
+    const key = uuid(32);
+    const options = {
+      scope: bucket,
+      deadline: currentTime,
+      saveKey: key,
+    };
+    const putPolicy = new qiniu.rs.PutPolicy(options);
+    const uploadToken = putPolicy.uploadToken(mac);
+    const info = {
+      token: uploadToken,
+      url: domain,
+    };
+    // console.log('qiniu_key', access_key, secret_key, bucket, domain);
+    // console.log(payload, data);
     return info;
   }
 }
