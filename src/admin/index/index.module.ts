@@ -8,9 +8,11 @@ import { SettingsEntity } from 'src/api/settings/entities/setting.entity';
 import { OrderEntity } from './entities/order.entity';
 import { ShopUserEntity } from '../user/entities/user.entity';
 import { CartEntity } from 'src/api/cart/entities/cart.entity';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot(), // 加载配置
     TypeOrmModule.forFeature([
       GoodsEntity,
       UserEntity,

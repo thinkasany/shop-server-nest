@@ -34,6 +34,18 @@ export class OrderEntity {
   @Column({ type: 'varchar', length: 60, default: '' })
   consignee: string;
 
+  @Column({ type: 'smallint', unsigned: true, default: 0 })
+  country: number;
+
+  @Column({ type: 'smallint', unsigned: true, default: 0 })
+  province: number;
+
+  @Column({ type: 'smallint', unsigned: true, default: 0 })
+  city: number;
+
+  @Column({ type: 'smallint', unsigned: true, default: 0 })
+  district: number;
+
   @Column({ type: 'varchar', length: 255, default: '0' })
   pay_id: string;
 
@@ -43,6 +55,82 @@ export class OrderEntity {
     default: 0,
     comment: '订单删除标志',
   })
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    default: 0.0,
+    comment: '0没改价，不等于0改过价格，这里记录原始的价格',
+  })
+  change_price: number;
+
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    default: 0.0,
+    comment: '实际需要支付的金额',
+  })
+  actual_price: number;
+
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    default: 0.0,
+    comment: '订单总价',
+  })
+  order_price: number;
+
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    default: 0.0,
+    comment: '商品总价',
+  })
+  goods_price: number;
+
+  @Column({ type: 'int' })
+  add_time: number;
+
+  @Column({ type: 'int', comment: '付款时间' })
+  pay_time: number;
+
+  @Column({ type: 'int', comment: '发货时间' })
+  shipping_time: number;
+
+  @Column({ type: 'int', comment: '确认时间' })
+  confirm_time: number;
+
+  @Column({ type: 'int', comment: '成交时间，用户评论或自动好评时间' })
+  dealdone_time: number;
+
+  @Column({ type: 'int', comment: '配送费用' })
+  freight_price: number;
+
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    default: 480.0,
+    comment: '顺丰保价金额',
+  })
+  express_value: number;
+
+  @Column({
+    type: 'varchar',
+    length: 255,
+    default: '需电联客户请优先派送勿放快递柜',
+  })
+  remark: string;
+
+  @Column({ type: 'tinyint' })
+  order_type: number;
+
+  @Column({ type: 'tinyint' })
   is_delete: number;
-    goods: any;
+  @Column({ type: 'varchar', length: 255, nullable: false, default: '' })
+  postscript: string;
+  goods: any;
 }

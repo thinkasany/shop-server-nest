@@ -14,7 +14,7 @@ export class GoodsSpecificationEntity {
   @Column({ type: 'varchar', length: 50 })
   value: string;
 
-  @Column({ type: 'varchar', length: 255 })
+  @Column({ type: 'varchar', length: 255, default: '' })
   pic_url: string;
 
   @Column({ type: 'tinyint', default: 0 })

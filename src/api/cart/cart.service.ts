@@ -298,9 +298,9 @@ export class CartService {
   }
 
   async getCart(type, userId) {
-    console.log(type, userId);
+    console.log('getCart', type, userId);
     let cartList = [];
-    if (type === 0) {
+    if (type === 0 && userId) {
       cartList = await this.cartRepository.find({
         where: {
           user_id: userId,

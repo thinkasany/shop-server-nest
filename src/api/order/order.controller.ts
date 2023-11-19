@@ -12,14 +12,36 @@ export class OrderController {
   listAction(
     @Query('page') page: number,
     @Query('size') size: number,
+    @Query('showType') showType: number,
     @Req() request,
   ) {
-    const { user_id: userId } = request.user;
-    return this.orderService.listAction({ userId, page, size });
+    const { id: userId } = request.user;
+    return this.orderService.listAction({ userId, page, size, showType });
   }
-
-  // @Post()
-  // create(@Body() createOrderDto: CreateOrderDto) {
-  //   return this.orderService.create(createOrderDto);
-  // }
+  @Get('orderCount')
+  @UseGuards(LoginGuard)
+  orderCountAction(@Req() request) {
+    const { id: userId } = request.user;
+    return this.orderService.orderCountAction({ userId });
+  }
+  @Get('detail')
+  @UseGuards(LoginGuard)
+  detailAction(@Query('orderId') orderId, @Req() request) {
+    const { id: userId } = request.user;
+    return this.orderService.detailAction({ userId, orderId });
+  }
+  // 查询物流信息asd
+  @Get('express')
+  @UseGuards(LoginGuard)
+  expressAction(@Query('orderId') orderId, @Req() request) {
+    const { id: userId } = request.user;
+    return this.orderService.expressAction({ userId, orderId });
+  }
+  // order 和 order-check 的goodslist
+  @Get('orderGoods')
+  @UseGuards(LoginGuard)
+  orderGoodsAction(@Query('orderId') orderId, @Req() request) {
+    const { id: userId } = request.user;
+    return this.orderService.orderGoodsAction({ userId, orderId });
+  }
 }

@@ -10,9 +10,11 @@ import { CartEntity } from 'src/api/cart/entities/cart.entity';
 import { SpecificationEntity } from 'src/api/goods/entities/specification.entity';
 import { GoodsGalleryEntity } from 'src/api/goods/entities/goodsGallery.entity';
 import { ShopFreightTemplateEntity } from './entities/freightTemplate.entity';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot(), // 加载配置
     TypeOrmModule.forFeature([
       GoodsEntity,
       CategoryEntity,

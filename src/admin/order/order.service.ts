@@ -11,7 +11,7 @@ import { OrderExpressEntity } from './entities/orderExpress.entity';
 import * as dayjs from 'dayjs';
 
 @Injectable()
-export class OrderService {
+export class AdminOrderService {
   @InjectRepository(RegionEntity)
   private readonly regionRepository: Repository<RegionEntity>;
   @InjectRepository(SettingsEntity)
