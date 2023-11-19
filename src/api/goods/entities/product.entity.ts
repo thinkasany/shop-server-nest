@@ -26,7 +26,7 @@ export class ProductEntity {
   @Column({ type: 'double', precision: 6, scale: 2 })
   goods_weight: number;
 
-  @Column({ type: 'tinyint', unsigned: true })
+  @Column({ type: 'tinyint', unsigned: true, default: '0' })
   has_change: number;
 
   @Column({ type: 'varchar', length: 120 })
@@ -35,7 +35,7 @@ export class ProductEntity {
   @Column({ type: 'tinyint', unsigned: true })
   is_on_sale: number | string;
 
-  @Column({ type: 'tinyint', unsigned: true })
+  @Column({ type: 'tinyint', unsigned: true, default: '0' })
   is_delete: number;
   value: string;
 }

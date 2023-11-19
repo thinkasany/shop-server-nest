@@ -23,16 +23,16 @@ export class GoodsEntity {
   @Column({ type: 'int', unsigned: true, default: 0 })
   sell_volume: number;
 
-  @Column({ type: 'varchar', length: 255 })
+  @Column({ type: 'varchar', length: 255, default: '' })
   keywords: string;
 
-  @Column({ type: 'varchar', length: 100 })
+  @Column({ type: 'varchar', length: 100, default: 0 })
   retail_price: string;
 
   @Column({ type: 'decimal', precision: 10, scale: 2, default: 0.0 })
   min_retail_price: number;
 
-  @Column({ type: 'varchar', length: 100 })
+  @Column({ type: 'varchar', length: 100, default: 0 })
   cost_price: string;
 
   @Column({ type: 'decimal', precision: 10, scale: 2, default: 0.0 })
@@ -56,10 +56,10 @@ export class GoodsEntity {
   @Column({ type: 'varchar', length: 45, comment: '商品单位' })
   goods_unit: string;
 
-  @Column({ type: 'varchar', length: 255, comment: '商品https图' })
+  @Column({ type: 'varchar', length: 255, comment: '商品https图', default: '' })
   https_pic_url: string;
 
-  @Column({ type: 'varchar', length: 255, comment: '商品列表图' })
+  @Column({ type: 'varchar', length: 255, comment: '商品列表图', default: '' })
   list_pic_url: string;
 
   @Column({ type: 'int', default: 0 })

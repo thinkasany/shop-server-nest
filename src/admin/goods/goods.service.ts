@@ -466,8 +466,191 @@ export class GoodsService {
     const httpsUrl = await uploadQiniu();
     let lastUrl = domain + httpsUrl;
     console.log('httpsUrl', httpsUrl, lastUrl);
-    return {
-      lastUrl,
-    };
+    return lastUrl;
+  }
+  async storeAction(payload) {
+    const { info: values, specData, specValue, cateId } = payload;
+    let picUrl = values.list_pic_url;
+    let goods_id = values.id;
+    values.category_id = cateId;
+    values.is_index = values.is_index ? 1 : 0;
+    values.is_new = values.is_new ? 1 : 0;
+    values.is_new = values.is_new ? 1 : 0;
+    let id = values.id;
+    if (id > 0) {
+      await this.goodsRepository.update(
+        {
+          id,
+        },
+        values,
+      );
+      await this.cartRepository.update(
+        {
+          goods_id: id,
+        },
+        {
+          checked: values.is_on_sale,
+          is_on_sale: values.is_on_sale,
+          list_pic_url: picUrl,
+          freight_template_id: values.freight_template_id,
+        },
+      );
+      await this.productRepository.update(
+        {
+          goods_id: id,
+        },
+        {
+          is_delete: 1,
+        },
+      );
+      await this.goodsSpecificationRepository.update(
+        {
+          goods_id: id,
+        },
+        {
+          is_delete: 1,
+        },
+      );
+      for (const item of specData) {
+        if (item.id > 0) {
+          await this.cartRepository.update(
+            {
+              product_id: item.id,
+              is_delete: 0,
+            },
+            {
+              retail_price: item.retail_price,
+              goods_specifition_name_value: item.value,
+              goods_sn: item.goods_sn,
+            },
+          );
+          delete item.is_delete;
+          item.is_delete = 0;
+          await this.productRepository.update(
+            {
+              id: item.id,
+            },
+            item,
+          );
+          const specificationData = {
+            value: item.value,
+            specification_id: specValue,
+            is_delete: 0,
+          };
+          await this.goodsSpecificationRepository.update(
+            {
+              id: item.goods_specification_ids,
+            },
+            specificationData,
+          );
+        } else {
+          const specificationData = {
+            value: item.value,
+            goods_id: id,
+            specification_id: specValue,
+          };
+          const specId =
+            await this.goodsSpecificationRepository.insert(specificationData);
+          item.goods_specification_ids = specId;
+          item.goods_id = id;
+          await this.productRepository.insert(item);
+        }
+      }
+    } else {
+      delete values.id;
+      const newdata = await this.goodsRepository.insert({
+        ...values,
+      });
+      goods_id = newdata.raw.insertId;
+      for (const item of specData) {
+        let specificationData = {
+          value: item.value,
+          goods_id: goods_id,
+          specification_id: specValue,
+        };
+        let specId = await (
+          await this.goodsSpecificationRepository.insert(specificationData)
+        ).raw.insertId;
+        item.goods_specification_ids = specId;
+        item.goods_id = goods_id;
+        item.is_on_sale = 1;
+        await this.productRepository.insert(item);
+      }
+    }
+
+    const pro = await this.productRepository.find({
+      where: {
+        goods_id,
+        is_on_sale: 1,
+        is_delete: 0,
+      },
+    });
+    if (pro.length > 1) {
+      const goodsNum = await this.productRepository
+        .createQueryBuilder('product')
+        .select('SUM(product.goods_number)', 'goodsNum')
+        .where({
+          goods_id: goods_id,
+          is_on_sale: 1,
+          is_delete: 0,
+        })
+        .getRawOne();
+      const retail_price: any = await this.productRepository.findOne({
+        where: {
+          goods_id,
+          is_on_sale: 1,
+          is_delete: 0,
+        },
+        select: ['retail_price'],
+      });
+      const maxPrice = Math.max(...retail_price);
+      const minPrice = Math.min(...retail_price);
+      const cost: any = await this.productRepository.findOne({
+        where: {
+          goods_id,
+          is_on_sale: 1,
+          is_delete: 0,
+        },
+        select: ['cost'],
+      });
+      let maxCost = Math.max(...cost);
+      let minCost = Math.min(...cost);
+      let goodsPrice: any = '';
+      if (minPrice == maxPrice) {
+        goodsPrice = minPrice;
+      } else {
+        goodsPrice = minPrice + '~' + maxPrice;
+      }
+      let costPrice = minCost + '~' + maxCost;
+      await this.goodsRepository.update(
+        { id: goods_id },
+        {
+          goods_number: goodsNum,
+          retail_price: goodsPrice,
+          cost_price: costPrice,
+          min_retail_price: minPrice,
+          min_cost_price: minCost,
+        },
+      );
+    } else {
+      const info: any = {
+        goods_number: pro[0].goods_number,
+        retail_price: pro[0].retail_price,
+        cost_price: pro[0].cost,
+        min_retail_price: pro[0].retail_price,
+        min_cost_price: pro[0].cost,
+      };
+      await this.goodsRepository.update({ id: goods_id }, info);
+    }
+    return values;
+  }
+  async destoryAction(payload) {
+    const { id } = payload;
+    await this.goodsRepository.update({ id }, { is_delete: 1 });
+    await this.productRepository.update({ goods_id: id }, { is_delete: 1 });
+    await this.goodsSpecificationRepository.update(
+      { goods_id: id },
+      { is_delete: 1 },
+    );
   }
 }

@@ -57,4 +57,12 @@ export class GoodsController {
   uploadHttpsImageAction(@Body() payload) {
     return this.goodsService.uploadHttpsImageAction(payload);
   }
+  @Post('store')
+  uploadHttpsImagstoreActioneAction(@Body() payload) {
+    return this.goodsService.storeAction(payload);
+  }
+  @Post('destory')
+  destoryAction(@Body() payload) {
+    return this.goodsService.destoryAction(payload);
+  }
 }
