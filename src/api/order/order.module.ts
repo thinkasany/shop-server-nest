@@ -10,6 +10,12 @@ import { SettingsEntity } from '../settings/entities/setting.entity';
 import { OrderExpressEntity } from 'src/admin/order/entities/orderExpress.entity';
 import { ShopUserEntity } from 'src/admin/user/entities/user.entity';
 import { CartEntity } from '../cart/entities/cart.entity';
+import { AddressEntity } from '../address/entities/address.entity';
+import { ProductEntity } from '../goods/entities/product.entity';
+import { GoodsEntity } from '../goods/entities/good.entity';
+import { GoodsSpecificationEntity } from '../goods/entities/goodsSpecification.entity';
+import { CartService } from '../cart/cart.service';
+import { AddressService } from '../address/address.service';
 
 @Module({
   imports: [
@@ -20,12 +26,16 @@ import { CartEntity } from '../cart/entities/cart.entity';
       SettingsEntity,
       OrderEntity,
       OrderExpressEntity,
-      OrderGoodsEntity,
+      GoodsEntity,
+      ProductEntity,
+      GoodsSpecificationEntity,
       ShopUserEntity,
       CartEntity,
+      AddressEntity,
+      SettingsEntity,
     ]),
   ],
   controllers: [OrderController],
-  providers: [OrderService, AdminOrderService],
+  providers: [OrderService, AdminOrderService, CartService, AddressService],
 })
 export class OrderModule {}

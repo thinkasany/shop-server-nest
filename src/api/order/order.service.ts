@@ -6,10 +6,15 @@ import { Repository, In, LessThan } from 'typeorm';
 import { OrderGoodsEntity } from '../goods/entities/orderGoods.entity';
 import { OrderEntity } from './entities/order.entity';
 import { AdminOrderService } from 'src/admin/order/order.service';
+import { CartService } from 'src/api/cart/cart.service';
 import { RegionEntity } from '../region/entities/region.entity';
 import { OrderExpressEntity } from 'src/admin/order/entities/orderExpress.entity';
 import { ApiException } from 'src/api-exception.filter';
 import { CartEntity } from '../cart/entities/cart.entity';
+import { AddressEntity } from '../address/entities/address.entity';
+import { ProductEntity } from '../goods/entities/product.entity';
+import { SettingsEntity } from '../settings/entities/setting.entity';
+import { generateOrderNumber } from 'src/utils';
 
 @Injectable()
 export class OrderService {
@@ -23,10 +28,20 @@ export class OrderService {
   private readonly orderExpressRepository: Repository<OrderExpressEntity>;
   @InjectRepository(CartEntity)
   private readonly cartRepository: Repository<CartEntity>;
-  constructor(private AdminOrderService: AdminOrderService) {}
+  @InjectRepository(AddressEntity)
+  private readonly addressRepository: Repository<AddressEntity>;
+  @InjectRepository(ProductEntity)
+  private readonly productRepository: Repository<ProductEntity>;
+  @InjectRepository(SettingsEntity)
+  private readonly settingsRepository: Repository<SettingsEntity>;
+
+  constructor(
+    private AdminOrderService: AdminOrderService,
+    private CartService: CartService,
+  ) {}
   async listAction(payload) {
-    const { size, page, showType } = payload;
-    const userId = 1099; // fixme mock
+    const { size, page, showType, userId } = payload;
+    // const userId = 1099; // fixme mock
     console.log(size, page, userId);
     const is_delete = 0;
     const status = await this.getOrderStatus(showType);
@@ -223,8 +238,8 @@ export class OrderService {
   }
   async detailAction(payload) {
     console.log(payload);
-    const { orderId } = payload;
-    const userId = 1099; // fixme mock
+    const { orderId, userId } = payload;
+    // const userId = 1099; // fixme mock
     const orderInfo: any = await this.orderRepository.findOne({
       where: {
         user_id: userId,
@@ -508,5 +523,124 @@ export class OrderService {
       });
       return cartList;
     }
+  }
+  async submitAction(userId, payload) {
+    // 获取收货地址信息和计算运费
+    const { addressId, freightPrice, offlinePay, postscript } = payload;
+    let { actualPrice } = payload;
+    const buffer = Buffer.from(postscript); // 留言
+    const checkedAddress = await this.addressRepository.findOne({
+      where: {
+        id: addressId,
+      },
+    });
+    if (!checkedAddress) {
+      throw new HttpException('请选择收货地址', 500);
+    }
+    // 获取要购买的商品
+    const checkedGoodsList = await this.cartRepository.find({
+      where: {
+        user_id: userId,
+        checked: 1,
+        is_delete: 0,
+      },
+    });
+    if (!checkedGoodsList) {
+      throw new HttpException('请选择商品', 500);
+    }
+    let checkPrice = 0;
+    let checkStock = 0;
+    for (const item of checkedGoodsList) {
+      const product = await this.productRepository.findOne({
+        where: {
+          id: item.product_id,
+        },
+      });
+
+      if (item.number > product.goods_number) {
+        checkStock++;
+      }
+      if (item.retail_price != item.add_price) {
+        checkPrice++;
+      }
+    }
+    if (checkStock > 0) {
+      throw new HttpException('库存不足，请重新下单', 500);
+    }
+    if (checkPrice > 0) {
+      throw new HttpException('价格发生变化，请重新下单', 500);
+    }
+    // 获取订单使用的红包
+    // 如果有用红包，则将红包的数量减少，当减到0时，将该条红包删除
+    // 统计商品总价
+    let goodsTotalPrice = 0.0;
+    for (const cartItem of checkedGoodsList) {
+      goodsTotalPrice += cartItem.number * cartItem.retail_price;
+    }
+    // 订单价格计算
+    const orderTotalPrice = goodsTotalPrice + freightPrice; // 订单的总价
+    actualPrice = orderTotalPrice - 0.0; // 减去其它支付的金额后，要实际支付的金额 比如满减等优惠
+    const currentTime = Number(new Date().getTime() / 1000);
+    let print_info = '';
+    for (const item in checkedGoodsList) {
+      const i = Number(item) + 1;
+      print_info =
+        print_info +
+        i +
+        '、' +
+        checkedGoodsList[item].goods_aka +
+        '【' +
+        checkedGoodsList[item].number +
+        '】 ';
+    }
+    const orderInfo: any = {
+      order_sn: generateOrderNumber(),
+      user_id: userId,
+      // 收货地址和运费
+      consignee: checkedAddress.name,
+      mobile: checkedAddress.mobile,
+      province: checkedAddress.province_id,
+      city: checkedAddress.city_id,
+      district: checkedAddress.district_id,
+      address: checkedAddress.address,
+      order_status: 101, // 订单初始状态为 101
+      // 根据城市得到运费，这里需要建立表：所在城市的具体运费
+      freight_price: freightPrice,
+      postscript: buffer.toString('base64'),
+      add_time: currentTime,
+      goods_price: goodsTotalPrice,
+      order_price: orderTotalPrice,
+      actual_price: actualPrice,
+      change_price: actualPrice,
+      print_info: print_info,
+      offline_pay: offlinePay,
+    };
+    // 开启事务，插入订单信息和订单商品
+    const orderId = await this.orderRepository.insert(orderInfo);
+    orderInfo.id = orderId.raw.insertId;
+    if (!orderId) {
+      throw new HttpException('订单提交失败', 500);
+    }
+    // 将商品信息录入数据库
+    const orderGoodsData = [];
+    for (const goodsItem of checkedGoodsList) {
+      orderGoodsData.push({
+        user_id: userId,
+        order_id: orderId,
+        goods_id: goodsItem.goods_id,
+        product_id: goodsItem.product_id,
+        goods_name: goodsItem.goods_name,
+        goods_aka: goodsItem.goods_aka,
+        list_pic_url: goodsItem.list_pic_url,
+        retail_price: goodsItem.retail_price,
+        number: goodsItem.number,
+        goods_specifition_name_value: goodsItem.goods_specifition_name_value,
+        goods_specifition_ids: goodsItem.goods_specifition_ids,
+      });
+    }
+    await this.orderGoodsRepository.save(orderGoodsData);
+    await this.CartService.clearBuyGoods(userId);
+    console.log(payload);
+    return orderInfo;
   }
 }
