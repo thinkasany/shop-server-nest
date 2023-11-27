@@ -285,6 +285,7 @@ export class OrderService {
         is_delete: 0,
       },
     });
+    console.log('orderGoods', orderGoods);
     let goodsCount = 0;
     for (const gitem of orderGoods) {
       goodsCount += gitem.number;
@@ -432,7 +433,8 @@ export class OrderService {
       },
     });
     if (!info) {
-      throw new ApiException(400, '暂无物流信息', HttpStatus.BAD_REQUEST);
+      return '暂无物流信息';
+      // throw new ApiException(400, '暂无物流信息', HttpStatus.BAD_REQUEST);
     }
     // 如果is_finish == 1；或者 updateTime 小于 1分钟，
     const updateTime = info.update_time;
@@ -626,7 +628,7 @@ export class OrderService {
     for (const goodsItem of checkedGoodsList) {
       orderGoodsData.push({
         user_id: userId,
-        order_id: orderId,
+        order_id: orderId.raw.insertId,
         goods_id: goodsItem.goods_id,
         product_id: goodsItem.product_id,
         goods_name: goodsItem.goods_name,

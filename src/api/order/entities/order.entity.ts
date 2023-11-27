@@ -136,5 +136,7 @@ export class OrderEntity {
   is_delete: number;
   @Column({ type: 'varchar', length: 255, nullable: false, default: '' })
   postscript: string;
+  @Column({ type: 'varchar', length: 120, default: '' })
+  address: string;
   goods: any;
 }
