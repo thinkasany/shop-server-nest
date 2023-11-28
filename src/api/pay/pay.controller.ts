@@ -7,9 +7,9 @@ export class IndexController {
   constructor(private readonly indexService: IndexService) {}
 
   @Get('preWeixinPay')
-  //   @UseInterceptors(GetLoginUserIdInterceptor)
+  @UseInterceptors(GetLoginUserIdInterceptor)
   preWeixinPayAction(@Query('orderId') orderId: number) {
     // const { user_id: userId } = request.user || {};
-    return this.indexService.preWeixinPayAction(orderId);
+    return this.indexService.preWeixinPayAction({ orderId });
   }
 }
