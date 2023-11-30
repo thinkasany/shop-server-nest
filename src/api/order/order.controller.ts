@@ -1,4 +1,12 @@
-import { Controller, Get, Query, UseGuards, Req } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Query,
+  UseGuards,
+  Req,
+  Post,
+  Body,
+} from '@nestjs/common';
 import { LoginGuard } from 'src/login.guard';
 import { OrderService } from './order.service';
 
@@ -43,5 +51,11 @@ export class OrderController {
   orderGoodsAction(@Query('orderId') orderId, @Req() request) {
     const { id: userId } = request.user;
     return this.orderService.orderGoodsAction({ userId, orderId });
+  }
+  @Post('submit')
+  @UseGuards(LoginGuard)
+  submitAction(@Req() request, @Body() payload) {
+    const { id: userId } = request.user;
+    return this.orderService.submitAction(userId, payload);
   }
 }

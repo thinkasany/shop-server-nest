@@ -323,7 +323,6 @@ export class CartService {
     let checkedGoodsCount = 0;
     let checkedGoodsAmount = 0;
     let numberChange = 0;
-
     for (const cartItem of cartList) {
       const product = await this.productRepository.findOne({
         where: {
@@ -371,7 +370,7 @@ export class CartService {
         }
         // 查找商品的图片
         const info = await this.goodsRepository.findOne({
-          where: { id: cartItem.goodsId },
+          where: { id: cartItem.goods_id },
           select: ['list_pic_url'],
         });
         cartItem.list_pic_url = info.list_pic_url;
@@ -401,5 +400,21 @@ export class CartService {
         numberChange,
       },
     };
+  }
+  /**
+   * 清空已购买的商品
+   * @returns {Promise.<*>}
+   */
+  async clearBuyGoods(userId) {
+    const $res = await this.cartRepository.update(
+      {
+        user_id: userId,
+        checked: 1,
+        is_delete: 0,
+      },
+      { is_delete: 1 },
+    );
+
+    return $res;
   }
 }

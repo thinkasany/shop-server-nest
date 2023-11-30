@@ -94,16 +94,20 @@ export class OrderEntity {
   @Column({ type: 'int' })
   add_time: number;
 
-  @Column({ type: 'int', comment: '付款时间' })
+  @Column({ type: 'int', comment: '付款时间', default: '0' })
   pay_time: number;
 
-  @Column({ type: 'int', comment: '发货时间' })
+  @Column({ type: 'int', comment: '发货时间', default: '0' })
   shipping_time: number;
 
-  @Column({ type: 'int', comment: '确认时间' })
+  @Column({ type: 'int', comment: '确认时间', default: '0' })
   confirm_time: number;
 
-  @Column({ type: 'int', comment: '成交时间，用户评论或自动好评时间' })
+  @Column({
+    type: 'int',
+    comment: '成交时间，用户评论或自动好评时间',
+    default: '0',
+  })
   dealdone_time: number;
 
   @Column({ type: 'int', comment: '配送费用' })
@@ -125,12 +129,14 @@ export class OrderEntity {
   })
   remark: string;
 
-  @Column({ type: 'tinyint' })
+  @Column({ type: 'tinyint', default: '0' })
   order_type: number;
 
-  @Column({ type: 'tinyint' })
+  @Column({ type: 'tinyint', default: 0 })
   is_delete: number;
   @Column({ type: 'varchar', length: 255, nullable: false, default: '' })
   postscript: string;
+  @Column({ type: 'varchar', length: 120, default: '' })
+  address: string;
   goods: any;
 }

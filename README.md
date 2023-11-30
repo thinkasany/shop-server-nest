@@ -13,6 +13,11 @@ APPID = "" # 小程序 appid
 SECRET = "" # 小程序密钥
 ```
 
+https://wdk-docs.github.io/nest-docs/techniques/configuration/#_7
+
+在构建过程中，Nest CLI 不会自动移动你的assets(非 ts 文件)到dist文件夹。 为了确保你的 YAML 文件被复制，你必须在nest-cli.json文件中的compilerOptions#assets对象中指定这一点。 例如，如果config文件夹和src文件夹在同一级别，添加compilerOptions#assets值为 "assets": [{ "include": "../config/*.yaml", "outDir": "./dist/config" }]. 
+
+
 由于功能比较多，需要后续开发的会加上fixme 注意后续的修复工作
 fixme
 

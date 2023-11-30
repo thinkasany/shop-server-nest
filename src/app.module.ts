@@ -14,6 +14,7 @@ import { CatalogModule } from './api/catalog/catalog.module';
 import { IndexModule } from './api/index/index.module';
 import { CartModule } from './api/cart/cart.module';
 import { SearchModule } from './api/search/search.module';
+import { PayModule } from './api/pay/pay.module';
 import { AdminAuthModule } from './admin/auth/auth.module';
 import { UserModule } from './admin/user/user.module';
 import { AdminModule } from './admin/admin/admin.module';
@@ -79,6 +80,7 @@ import * as path from 'path';
     CategoryModule,
     ShipperModule,
     SpecificationModule,
+    PayModule,
   ],
   controllers: [AppController],
   providers: [AppService],
