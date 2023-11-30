@@ -5,8 +5,18 @@ import { Repository } from 'typeorm';
 import { OrderGoodsEntity } from '../goods/entities/orderGoods.entity';
 import { ProductEntity } from '../goods/entities/product.entity';
 import { OrderEntity } from '../order/entities/order.entity';
+import { v3Pay } from 'src/utils';
 import { readFileSync } from 'fs';
 import * as path from 'path';
+const wechatpayConfig = {
+  appid: 'wx74862e0dfcf69954', // 公众号 AppID
+  mch_id: '1558950191', // 商户号
+  notify_url: 'https://example.com/pay/notify', // 支付结果通知网址
+  key: readFileSync(
+    path.resolve(__dirname, '../../secret/apiclientkey.pem'),
+    'utf-8',
+  ), // API 密钥
+};
 
 @Injectable()
 export class IndexService {
@@ -17,11 +27,20 @@ export class IndexService {
   @InjectRepository(ProductEntity)
   private readonly productRepository: Repository<ProductEntity>;
   async preWeixinPayAction(payload) {
-    const res = readFileSync(
-      path.resolve(__dirname, '../../secret/apiclientkey.pem'),
-      'utf-8',
-    );
-    console.log(res);
+    console.log(payload);
+    const order = {
+      appid: 'wx74862e0dfcf69954', // appid
+      mchid: '1558950191', // 商户号
+      description: '测试支付',
+      out_trade_no: 'wzm202310209122111',
+      amount: {
+        total: 1,
+      },
+      notify_url: 'https://xxx.cn/',
+    };
+    const data = v3Pay(order, '34345964330B66427E0D3D28826C4993C77E631F'); // 证书编号，在商户后台申请证书后
+    return data;
+    // console.log(wechatpayConfig);
   }
   async preWeixinPayAction1(payload) {
     const { orderId } = payload;

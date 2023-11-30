@@ -1,4 +1,5 @@
 import * as _ from 'lodash';
+import { v3Pay } from './v3';
 export const generateOrderNumber = () => {
   const date = new Date();
   return (
@@ -11,3 +12,5 @@ export const generateOrderNumber = () => {
     _.random(100000, 999999)
   );
 };
+
+export { v3Pay };
